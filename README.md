@@ -6,4 +6,5 @@ for useage see: http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar/syntax
 
 for installation see: https://www.mediawiki.org/wiki/Extension:W4G_Rating_Bar
 
-I've only tested the rating functionality on MW 1.27.1, the mmigration feature to update from rating bar 1.1 I updated so it no longer generates errors but I haven't tested the functionality of it, use at your own risk.
+I've only tested the rating bar functionality on MW 1.27.1 probably works with 1.27, 1.26 and earlier may not work.
+Tthe mmigration feature to update from rating bar v1.1 I have not tested at all, I updated so it no longer generates errors but nothing else, use at your own risk.
