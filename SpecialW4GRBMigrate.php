@@ -55,7 +55,6 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			return;
 		}
 
-		$this->skin = "vector"; # that's useful for creating links more easily
 		$this->setHeaders(); # not sure what that's for
 		$wgOut->disable(); # for raw output
 		
