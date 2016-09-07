@@ -41,9 +41,6 @@ class W4GRB extends UnlistedSpecialPage
 	{
 		global $wgRequest, $wgOut, $wgUser;
 		global $wgW4GRB_Settings;
-
-		$wgUser = RequestContext::getMain()->getUser();
-		$this->skin = "vector";
 		
 		$this->setHeaders(); # not sure what's that for
 		$wgOut->disable(); # for raw output

@@ -662,17 +662,14 @@ updatebox('.$bid.',W4GRB.average_rating['.$bid.']);
 
 // Make a link to another page of the wiki using MediaWiki's API
 function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
-{
-	global $wgUser;
-	$skin = $wgUser->getSkin();
-	
+{	
 	if(!$safe)
-		$link = $skin->makeKnownLinkObj(Title::makeTitle($page_namespace, $page_title));
+		$link = Linker::link(Title::makeTitle($page_namespace, $page_title));
 	else
 		{
 		$title = Title::makeTitleSafe($page_namespace, $page_title);
 		if(!is_null($title))
-			$link = $skin->makeKnownLinkObj($title);
+			$link = Linker::link($title);
 		else
 			$link = "There is no <i>" . htmlspecialchars( $page_title ) . "</i> in namespace <i>" . htmlspecialchars( $page_namespace )."</i>";
 		}
@@ -683,10 +680,8 @@ function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
 function W4GrbMakeLinkUser( $user_id, $user_name, $displayusertools = false )
 {
 	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
-	global $wgUser;
-	$skin = $wgUser->getSkin();
 	
-	$link = $skin->userLink( $user_id, $user_name );
-	if($displayusertools) $link .= $skin->userToolLinks( $user_id, $user_name );
-	return $link;
+	$link = Linker::link( $user_id, $user_name );
+//	if($displayusertools) $link .= $skin->userToolLinks( $user_id, $user_name );
+	return $link; 
 }
