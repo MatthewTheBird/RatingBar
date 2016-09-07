@@ -207,6 +207,7 @@ function W4GrbShowRatingBar ( $parser, $fullpagename = '' )
 function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 {
 	global $W4GRB_ratinglist_count, $wgW4GRB_Settings;
+	$hidevotecount;
 	if(is_int($W4GRB_ratinglist_count))
 		{
 		if($W4GRB_ratinglist_count>=$wgW4GRB_Settings['max-lists-per-page'])
@@ -221,10 +222,10 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	global $wgW4GRB_Path;
 	
 	# Add CSS on first call (this can result in adding this twice if already added by the bar - not sure if fixing this is really worth the perf loss)
-	if(!$wgW4GRB_Settings['auto-include'] && $w4g_ratinglist_calls<=1)
-	{
-	$parser->mOutput->addHeadItem('<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
-	}
+#	if(!$wgW4GRB_Settings['auto-include'] && $w4g_ratinglist_calls<=1)
+#	{
+#	$parser->mOutput->addHeadItem('<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
+#	}
 	
 	# Possible types: toppages, topvoters, uservotes, pagevotes, latestvotes
 	
@@ -263,6 +264,8 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		$category = $wgW4GRB_Settings['fix-spaces'] ? str_replace(" ","_",$argv['category']) : $argv['category'];
 	else $category='';
 	
+	$days = '';
+	
 	# Get period (in days) and convert it into the timestamp of the beginning of that period
 	if(isset($argv['days']) && $argv['days']>0)
 		{
@@ -281,7 +284,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user, '.$wgDBprefix.'page AS page';
 		if($category!='')
 			{
-			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.mysql_real_escape_string($category).'"'));
+			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.$category.'"'));
 			$database_filter .= ', '.$wgDBprefix.'categorylinks AS catlink';
 			}
 		$result=$dbslave->select(
@@ -291,7 +294,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				__METHOD__,
 				array('ORDER BY' => 'w4grb_votes.time DESC', 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 				);
-		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
+		$out = '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
 						.wfMessage('w4g_rb-latest-votes',
 							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
@@ -373,12 +376,14 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		$user = $wgW4GRB_Settings['fix-spaces'] ? str_replace("_"," ",$argv['user']) : $argv['user'];
 		if(is_null(User::idFromName($user))) return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_user_with_this_name',htmlspecialchars($user)).'</br></span>';
 		
+//		$conn = LoadBalancer::getConnection();
+
 		$dbslave = wfGetDB( DB_SLAVE );
-		$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime,'user.user_name="'.mysql_real_escape_string($user).'"');
+		$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime,'user.user_name="'.$user.'"');
 		$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user, '.$wgDBprefix.'page AS page';
 		if($category!='')
 			{
-			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.mysql_real_escape_string($category).'"') );
+			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.$category.'"') );
 			$database_filter .= ', '.$wgDBprefix.'categorylinks AS catlink';
 			}
 		$orderby_field = 'w4grb_votes.time';
@@ -392,7 +397,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				array('ORDER BY' => $orderby_field.' '. (($order!='')?$order:'DESC'), 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 				);
 		
-		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
+		$out = '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
 						.wfMessage('w4g_rb-caption-user-votes',
 							W4GrbMakeLinkUser(User::idFromName($user), $user),
@@ -450,7 +455,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page';
 			if($category!='')
 				{
-				$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.mysql_real_escape_string($category).'"'));
+				$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
 				$database_filter .= ', '.$wgDBprefix.'categorylinks AS catlink';
 				}
 			$result=$dbslave->select(
@@ -470,7 +475,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'page AS page';
 			if($category!='')
 				{
-				$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.mysql_real_escape_string($category).'"'));
+				$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
 				$database_filter .= ', '.$wgDBprefix.'categorylinks AS catlink';
 				}
 			$result=$dbslave->select(
@@ -518,7 +523,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user';
 		if($category!='')
 			{
-			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.mysql_real_escape_string($category).'"'));
+			$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_votes.pid','catlink.cl_to="'.$category.'"'));
 			$database_filter .= ', '.$wgDBprefix.'categorylinks AS catlink';
 			}
 		$result=$dbslave->select(
@@ -529,7 +534,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				array('GROUP BY' => 'user.user_id', 'ORDER BY' => 'COUNT(*) DESC', 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 				);
 		
-		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
+		$out = '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
 						.wfMessage('w4g_rb-caption-topvoters',
 							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''),
