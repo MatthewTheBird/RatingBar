@@ -28,7 +28,7 @@ class W4GRB extends UnlistedSpecialPage
 	function __construct()
 	{
 		parent::__construct( 'W4GRB');
-		$this->includable( false );
+		#$this->includable( false );
 	}
  
 	/**
@@ -42,10 +42,12 @@ class W4GRB extends UnlistedSpecialPage
 		global $wgRequest, $wgOut, $wgUser;
 		global $wgW4GRB_Settings;
 
-		$this->skin =& $wgUser->getSkin(); # that's useful for creating links more easily
+		$wgUser = RequestContext::getMain()->getUser();
+		$this->skin = "vector";
+		
 		$this->setHeaders(); # not sure what's that for
 		$wgOut->disable(); # for raw output
-		header( 'Pragma: nocache' ); # no caching
+//		header( 'Pragma: nocache' ); # no caching
 
 		# Get minimum parameters, then see if a vote was cast or if we just want to read
 		$this->bar_id = $wgRequest->getInt('bid') or die('No bar specified');
@@ -81,7 +83,7 @@ class W4GRB extends UnlistedSpecialPage
 			die($this->justShowVotes());
 		
 		$dbmaster = wfGetDB( DB_MASTER );
-		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
+//		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
 		# Checks in the master if the user has already voted
 		# (But don't do the search if casting an anonymous vote)
 		$user_already_voted=false;
@@ -150,11 +152,11 @@ class W4GRB extends UnlistedSpecialPage
 		{
 			# 1. Maybe this guy's trying to multivote! Let's check that with timestamps
 			if(time()-$most_recent_vote_from_ip < $wgW4GRB_Settings['multivote-cooldown'])
-				die (wfMsg('w4g_rb-error_ip_overused'));
+				die (wfMessage('w4g_rb-error_ip_overused'));
 			# 2. Maybe an anonymous is trying to vote from the same IP as a registered
 			#		user => this is not allowed
 			else if($this->uid==self::ANONYMOUS_UID)
-				die (wfMsg('w4g_rb-error_ip_used_by_registered'));	
+				die (wfMessage('w4g_rb-error_ip_used_by_registered'));	
 		}
 		# If we arrive there, the vote is new and clean (no vote from the
 		# same user at all, and not from same IP recently)
@@ -206,8 +208,8 @@ class W4GRB extends UnlistedSpecialPage
 		
 		
 		# Display what we did
-		echo wfMsg('w4g_rb-current_user_rating','<b>'.$average_rating.'</b>',$num_votes).'<br/>';
-		echo wfMsg('w4g_rb-you_voted').' <b><span id="w4g_rb_rating_value-'.$this->bar_id.'">'.$vote_sent.'</span>%</b>';
+		echo wfMessage('w4g_rb-current_user_rating','<b>'.$average_rating.'</b>',$num_votes).'<br/>';
+		echo wfMessage('w4g_rb-you_voted').' <b><span id="w4g_rb_rating_value-'.$this->bar_id.'">'.$vote_sent.'</span>%</b>';
 
 	}
 	
@@ -231,23 +233,23 @@ class W4GRB extends UnlistedSpecialPage
 		{
 		$average_rating = intval($row->avg);
 		$num_votes = intval($row->n);
-		$out .= wfMsg('w4g_rb-current_user_rating','<b>'.$average_rating.'</b>',$num_votes).'<br/>';
+		$out .= wfMessage('w4g_rb-current_user_rating','<b>'.$average_rating.'</b>',$num_votes).'<br/>';
 		}
-	else $out .= wfMsg('w4g_rb-nobody_voted').'.<br/>';
+	else $out .= wfMessage('w4g_rb-nobody_voted').'.<br/>';
 	$dbslave->freeResult($result);
 	
 	# If not logged in and anonymous voting not enabled
 	if($this->uid==self::ANONYMOUS_UID && !$wgW4GRB_Settings['anonymous-voting-enabled'])
 	{
-		$loginLink = $this->skin->link( SpecialPage::getTitleFor( 'Userlogin' ), wfMsg('w4g_rb-log_in'), array(), array());
-		$signupLink = $this->skin->link( SpecialPage::getTitleFor( 'Userlogin' ), wfMsg('w4g_rb-register'), array(), array('type'=>'signup'));
-		$out .= wfMsg('w4g_rb-error_must_login',$loginLink,$signupLink);
+		$loginLink = Linker::link( SpecialPage::getTitleFor( 'Userlogin' ), wfMessage('w4g_rb-log_in'), array(), array());
+		$signupLink = Linker::link( SpecialPage::getTitleFor( 'Userlogin' ), wfMessage('w4g_rb-register'), array(), array('type'=>'signup'));
+		$out .= wfMessage('w4g_rb-error_must_login',$loginLink,$signupLink)->plain();
 	}
 	# Else if not allowed to vote (NB: anonymous voting overrides this!)
 	else if (!$wgUser->isAllowed('w4g_rb-canvote') && !$wgW4GRB_Settings['anonymous-voting-enabled'])
 	{
-		$rightsLink = $this->skin->link( SpecialPage::getTitleFor( 'Listgrouprights' ), wfMsg('w4g_rb-voting_rights'), array(), array());
-		$out .= wfMsg('w4g_rb-error_no_canvote',$rightsLink);
+		$rightsLink = Linker::link( SpecialPage::getTitleFor( 'Listgrouprights' ), wfMessage('w4g_rb-voting_rights'), array(), array());
+		$out .= wfMessage('w4g_rb-error_no_canvote',$rightsLink);
 	}
 	# If the user can vote, get their vote (if anonymous, get the vote from their IP)
 	else
@@ -267,9 +269,9 @@ class W4GRB extends UnlistedSpecialPage
 		if($row = $dbslave->fetchObject($result))
 			{
 			$existing_vote = intval($row->vote);
-			$out .= wfMsg('w4g_rb-you_voted').' <b><span id="w4g_rb_rating_value-'.$this->bar_id.'">'.$existing_vote.'</span>%</b>';
+			$out .= wfMessage('w4g_rb-you_voted').' <b><span id="w4g_rb_rating_value-'.$this->bar_id.'">'.$existing_vote.'</span>%</b>';
 			}
-		else  $out .= wfMsg('w4g_rb-you_didnt_vote').'.<br/>';
+		else  $out .= wfMessage('w4g_rb-you_didnt_vote').'.<br/>';
 		$dbslave->freeResult($result);
 	}
 		

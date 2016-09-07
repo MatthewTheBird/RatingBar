@@ -23,13 +23,13 @@
 /**
 * Edit those accordingly to your previous Rating Bar v1.1 settings
 **/
-$W4GRBmigrationDBhost					= 'localhost';	// Copy value from $ratingbar_dbhost
-$W4GRBmigrationDBuser					= 'testwiki';	// Copy value from $ratingbar_dbuser
+$W4GRBmigrationDBhost					= '';	// Copy value from $ratingbar_dbhost
+$W4GRBmigrationDBuser					= '';	// Copy value from $ratingbar_dbuser
 $W4GRBmigrationDBpass					= '';		// Copy value from $ratingbar_dbpass
-$W4GRBmigrationDBname					= 'testwiki'; // Copy value from $ratingbar_dbname
-$W4GRBmigrationTablePrefix				= 'wg_';		// Copy value from $table_prefix
-$W4GRBmigrationTableBase				= 'ratingbar';	// Copy value from $ratingbar_tablename
-$remove_anonymous_votes                 = true;			// Whether or not you want to remove anonymous votes if you set this to false, you'll want to make sure the primary key of the w4grb_votes table is (uid,pid,ip)
+$W4GRBmigrationDBname					= '';// Copy value from $ratingbar_dbname
+$W4GRBmigrationTablePrefix				= '';		// Copy value from $table_prefix
+$W4GRBmigrationTableBase				= '';	// Copy value from $ratingbar_tablename
+$remove_anonymous_votes                 = false;			// Whether or not you want to remove anonymous votes if you set this to false, you'll want to make sure the primary key of the w4grb_votes table is (uid,pid,ip)
 $W4GRBmigrationFollow					= 100;			// Every $W4GRBmigrationFollow lines inserted you'll get a progress-o-meter message
 
 $W4GRBmigrationTableName=$W4GRBmigrationTablePrefix.$W4GRBmigrationTableBase;
@@ -39,7 +39,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 	function __construct()
 	{
 		parent::__construct( 'W4GRBMigrate');
-		$this->includable( false );
+#		$this->includable( false );
 	}
  
 	function execute( $par )
@@ -55,22 +55,21 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			return;
 		}
 
-		$this->skin =& $wgUser->getSkin(); # that's useful for creating links more easily
+		$this->skin = "vector"; # that's useful for creating links more easily
 		$this->setHeaders(); # not sure what that's for
 		$wgOut->disable(); # for raw output
-		header( 'Pragma: nocache' ); # no caching
 		
-		$db_old = mysql_connect($W4GRBmigrationDBhost, $W4GRBmigrationDBuser, $W4GRBmigrationDBpass) or die("Failed to connected to the database");
+		$db_old = mysqli_connect($W4GRBmigrationDBhost, $W4GRBmigrationDBuser, $W4GRBmigrationDBpass, $W4GRBmigrationDBname) or die("Failed to connected to the database");
 		$query='SELECT * FROM `'.$W4GRBmigrationTableName.'`;';
-		$db_old_result = mysql_query($query) or die('Failed to select table '.$W4GRBmigrationTableName.' (query: '.$query.mysql_error());
+		$db_old_result = mysqli_query($db_old, $query) or die('Failed to select table '.$W4GRBmigrationTableName.' (query: '.$query.mysqli_error($db_old));
 		$page_obj=new W4GRBPage();
  		
 		$dbmaster = wfGetDB( DB_MASTER ); # exceptionnally we'll run all on master
-		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
+#		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
 		
 		echo 'Database connection successful, starting vote import...<br/>';
 		$i=0;
-		while($db_old_row=mysql_fetch_array($db_old_result))
+		while($db_old_row=mysqli_fetch_array($db_old_result))
 			{
 			$i++; # line counter
 			# Read a line

@@ -159,11 +159,11 @@ function W4GrbShowRatingBar ( $parser, $fullpagename = '' )
 	if(is_int($W4GRB_ratingbar_count))
 		{
 		if ($W4GRB_ratingbar_count>=$wgW4GRB_Settings['max-bars-per-page'])
-			return array('<span class="w4g_rb-error">'.wfMsg('w4g_rb-error_exceeded_max_bars',$wgW4GRB_Settings['max-bars-per-page']).'.</br></span>', 'noparse' => true, 'isHTML' => true);
+			return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_exceeded_max_bars',$wgW4GRB_Settings['max-bars-per-page']).'.</br></span>', 'noparse' => true, 'isHTML' => true);
 		else $W4GRB_ratingbar_count++;
 		}
 	else if($wgW4GRB_Settings['max-bars-per-page']>0) $W4GRB_ratingbar_count=1;
-	else return array('<span class="w4g_rb-error">'.wfMsg('w4g_rb-error_no_bar_allowed').'.</br></span>', 'noparse' => true, 'isHTML' => true);
+	else return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_no_bar_allowed').'.</br></span>', 'noparse' => true, 'isHTML' => true);
 	
 	# Get neeeded globals
 	global $wgScriptPath;
@@ -190,7 +190,7 @@ function W4GrbShowRatingBar ( $parser, $fullpagename = '' )
 	if(!$page_obj->setFullPageName($fullpagename))
 		{
 		$parser->disableCache();
-		return array('<span class="w4g_rb-error">'.wfMsg('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
+		return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
 		}
 	
 	if($showTitle) {
@@ -210,11 +210,11 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	if(is_int($W4GRB_ratinglist_count))
 		{
 		if($W4GRB_ratinglist_count>=$wgW4GRB_Settings['max-lists-per-page'])
-			return '<span class="w4g_ratinglist-error">'.wfMsg('w4g_rb-error_exceeded_max_lists',$wgW4GRB_Settings['max-lists-per-page']).'.</span><br/>';
+			return '<span class="w4g_ratinglist-error">'.wfMessage('w4g_rb-error_exceeded_max_lists',$wgW4GRB_Settings['max-lists-per-page']).'.</span><br/>';
 		else $W4GRB_ratinglist_count++;
 		}
 	else if($wgW4GRB_Settings['max-lists-per-page']>0) $W4GRB_ratinglist_count=1;
-	else return '<span class="w4g_ratinglist-error">'.wfMsg('w4g_rb-error_no_list_allowed').'.</span><br/>';
+	else return '<span class="w4g_ratinglist-error">'.wfMessage('w4g_rb-error_no_list_allowed').'.</span><br/>';
 	
 	# Get neeeded globals
 	global $wgScriptPath, $wgDBprefix;
@@ -293,16 +293,16 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				);
 		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
-						.wfMsg('w4g_rb-latest-votes',
-							(($category!='') ? wfMsg('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
+						.wfMessage('w4g_rb-latest-votes',
+							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
 							$max_items,
-							(is_int($days)? wfMsg('w4g_rb-votes-in-days',$days) : ''))
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 						.'</caption>' : '')
 			.'<tr>'
-			.'<th>'.wfMsg('w4g_rb-time').'</th>'
-			.'<th>'.wfMsg('w4g_rb-page').'</th>'
-			.'<th>'.wfMsg('w4g_rb-rating').'</th>'
-			.'<th>'.wfMsg('w4g_rb-user').'</th>'
+			.'<th>'.wfMessage('w4g_rb-time').'</th>'
+			.'<th>'.wfMessage('w4g_rb-page').'</th>'
+			.'<th>'.wfMessage('w4g_rb-rating').'</th>'
+			.'<th>'.wfMessage('w4g_rb-user').'</th>'
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
 			{
@@ -310,7 +310,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				.'<td>'.date("F j, Y, g:i a",($row->time)).'</td>'
 				.'<td>'.W4GrbMakeLinkPage($row->ns, $row->title).'</td>'
 				.'<td>'.$row->vote.'%</td>'
-				. ($wgW4GRB_Settings['show-voter-names']? '<td>'.W4GrbMakeLinkUser($row->uid, $row->uname).'</td>' : '<td>'.wfMsg('w4g_rb-hidden_name').'</td>')
+				. ($wgW4GRB_Settings['show-voter-names']? '<td>'.W4GrbMakeLinkUser($row->uid, $row->uname).'</td>' : '<td>'.wfMessage('w4g_rb-hidden_name').'</td>')
 				.'</tr>';
 			}
 		$out .= "</table>";
@@ -328,7 +328,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			else $fullpagename = $parser->getTitle();
 		$page_obj=new W4GRBPage();
 		if(!$page_obj->setFullPageName($fullpagename))
-			return '<span class="w4g_rb-error">'.wfMsg('w4g_rb-no_page_with_this_name',htmlspecialchars($argv['idpage'])).'</br></span>';
+			return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',htmlspecialchars($argv['idpage'])).'</br></span>';
 		
 		$dbslave = wfGetDB( DB_SLAVE );
 		$result=$dbslave->select(
@@ -340,22 +340,22 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				);
 		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
-						.wfMsg('w4g_rb-caption-pagevotes',
+						.wfMessage('w4g_rb-caption-pagevotes',
 							W4GrbMakeLinkPage($page_obj->getNsID(), $page_obj->getFullPageName()),
 							$max_items,
-							(is_int($days)? wfMsg('w4g_rb-votes-in-days',$days) : ''))
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 						.'</caption>' : '')
 			.'<tr>'
-			.'<th>'.wfMsg('w4g_rb-time').'</th>'
-			.'<th>'.wfMsg('w4g_rb-rating').'</th>'
-			.'<th>'.wfMsg('w4g_rb-user').'</th>'
+			.'<th>'.wfMessage('w4g_rb-time').'</th>'
+			.'<th>'.wfMessage('w4g_rb-rating').'</th>'
+			.'<th>'.wfMessage('w4g_rb-user').'</th>'
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
 			{
 			$out .= '<tr>'
 				.'<td>'.date("F j, Y, g:i a",($row->time)).'</td>'
 				.'<td>'.$row->vote.'%</td>'
-				. ($wgW4GRB_Settings['show-voter-names']? '<td>'.W4GrbMakeLinkUser($row->uid, $row->uname).'</td>' : '<td>'.wfMsg('w4g_rb-hidden_name').'</td>')
+				. ($wgW4GRB_Settings['show-voter-names']? '<td>'.W4GrbMakeLinkUser($row->uid, $row->uname).'</td>' : '<td>'.wfMessage('w4g_rb-hidden_name').'</td>')
 				.'</tr>';
 			}
 		$out .= "</table>";
@@ -368,10 +368,10 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	**/
 	if(isset($argv['uservotes']))
 	{
-		if(!$wgW4GRB_Settings['show-voter-names']) return '<span class="w4g_rb-error">'.wfMsg('w4g_rb-error_function_disabled','w4g_ratinglist->uservotes').'<br/></span>';
-		if(!isset($argv['user']) || $argv['user']=='') return '<span class="w4g_rb-error">'.wfMsg('w4g_rb-error_missing_param','<i>user</i>').'<br/></span>';
+		if(!$wgW4GRB_Settings['show-voter-names']) return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_function_disabled','w4g_ratinglist->uservotes').'<br/></span>';
+		if(!isset($argv['user']) || $argv['user']=='') return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_missing_param','<i>user</i>').'<br/></span>';
 		$user = $wgW4GRB_Settings['fix-spaces'] ? str_replace("_"," ",$argv['user']) : $argv['user'];
-		if(is_null(User::idFromName($user))) return '<span class="w4g_rb-error">'.wfMsg('w4g_rb-no_user_with_this_name',htmlspecialchars($user)).'</br></span>';
+		if(is_null(User::idFromName($user))) return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_user_with_this_name',htmlspecialchars($user)).'</br></span>';
 		
 		$dbslave = wfGetDB( DB_SLAVE );
 		$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime,'user.user_name="'.mysql_real_escape_string($user).'"');
@@ -394,16 +394,16 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		
 		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
-						.wfMsg('w4g_rb-caption-user-votes',
+						.wfMessage('w4g_rb-caption-user-votes',
 							W4GrbMakeLinkUser(User::idFromName($user), $user),
-							(($category!='') ? wfMsg('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
+							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
 							$max_items,
-							(is_int($days)? wfMsg('w4g_rb-votes-in-days',$days) : ''))
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 						.'</caption>' : '')
 			.'<tr>'
-			.'<th>'.wfMsg('w4g_rb-page').'</th>'
-			.'<th>'.wfMsg('w4g_rb-rating').'</th>'
-			.'<th>'.wfMsg('w4g_rb-time').'</th>'
+			.'<th>'.wfMessage('w4g_rb-page').'</th>'
+			.'<th>'.wfMessage('w4g_rb-rating').'</th>'
+			.'<th>'.wfMessage('w4g_rb-time').'</th>'
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
 			{
@@ -483,17 +483,17 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			}
 		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
-						.wfMsg('w4g_rb-caption-toppages',
-							($topvotecount ? wfMsg('w4g_rb-amount-of-votes') : wfMsg('w4g_rb-average-rating')),
-							(($category!='') ? wfMsg('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
+						.wfMessage('w4g_rb-caption-toppages',
+							($topvotecount ? wfMessage('w4g_rb-amount-of-votes') : wfMessage('w4g_rb-average-rating')),
+							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
 							$max_items,
-							(($minvotecount>1) ? wfMsg('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
-							(is_int($days)? wfMsg('w4g_rb-votes-in-days',$days) : ''))
+							(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 						.'</caption>' : '')
 			.'<tr>'
-			.'<th>'.wfMsg('w4g_rb-page').'</th>'
-			.($hideavgrating? '' : '<th>'.wfMsg('w4g_rb-rating').'</th>')
-			.($hidevotecount? '' : '<th>'.wfMsg('w4g_rb-vote-count').'</th>')
+			.'<th>'.wfMessage('w4g_rb-page').'</th>'
+			.($hideavgrating? '' : '<th>'.wfMessage('w4g_rb-rating').'</th>')
+			.($hidevotecount? '' : '<th>'.wfMessage('w4g_rb-vote-count').'</th>')
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
 			{
@@ -531,15 +531,15 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		
 		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 			. ($displaytitle? '<caption>'
-						.wfMsg('w4g_rb-caption-topvoters',
-							(is_int($days)? wfMsg('w4g_rb-votes-in-days',$days) : ''),
-							(($category!='') ? wfMsg('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
+						.wfMessage('w4g_rb-caption-topvoters',
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''),
+							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
 							$max_items)
 						.'</caption>' : '')
 			.'<tr>'
-			.'<th>'.wfMsg('w4g_rb-user').'</th>'
-			.($wgW4GRB_Settings['show-voter-names']? '<th>'.wfMsg('w4g_rb-rating').'</th>' : '')
-			.($hidevotecount? '' : '<th>'.wfMsg('w4g_rb-vote-count').'</th>')
+			.'<th>'.wfMessage('w4g_rb-user').'</th>'
+			.($wgW4GRB_Settings['show-voter-names']? '<th>'.wfMessage('w4g_rb-rating').'</th>' : '')
+			.($hidevotecount? '' : '<th>'.wfMessage('w4g_rb-vote-count').'</th>')
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
 			{
@@ -555,7 +555,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		return $out;
 	}
 
-	return wfMsg('w4g_rb-error_syntax_check_doc','<a href="http://www.wiki4games.com/Wiki4Games:W4G Rating Bar">','</a>');
+	return wfMessage('w4g_rb-error_syntax_check_doc','<a href="http://www.wiki4games.com/Wiki4Games:W4G Rating Bar">','</a>');
 }
 
 function W4GrbShowRawRating ( $parser, $fullpagename = '', $type = '' )
@@ -569,7 +569,7 @@ function W4GrbShowRawRating ( $parser, $fullpagename = '', $type = '' )
 		
 	$page_obj=new W4GRBPage();
 	if(!$page_obj->setFullPageName($fullpagename))
-		return array('<span class="w4g_rb-error">'.wfMsg('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
+		return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
 	
 	if($type=='avg') $output = $page_obj->getAVG();
 	else if ($type=='n') $output = $page_obj->getNVotes();
@@ -592,7 +592,7 @@ function W4GrbGetBarBase ( W4GRBPage $page_obj, $bid, $showTitle=false )
 	# If we need to show the page title (and if settings agree)
 	if($showTitle && $wgW4GRB_Settings['show-mismatching-bar'])
 		$output .= '<span class="w4g_rb-rating-page-named">'
-		.wfMsg('w4g_rb-rating_page_named',W4GrbMakeLinkPage($page_obj->getNsID(), $page_obj->getFullPageName()))
+		.wfMessage('w4g_rb-rating_page_named',W4GrbMakeLinkPage($page_obj->getNsID(), $page_obj->getFullPageName()))
 		.'</span><br/>';
 
 	# Start AJAX area
@@ -603,13 +603,13 @@ function W4GrbGetBarBase ( W4GRBPage $page_obj, $bid, $showTitle=false )
 		{
 		$average_rating = $page_obj->getAVG();
 		$num_votes = $page_obj->getNVotes();
-		$output .= wfMsg('w4g_rb-current_user_rating','<b>'.$average_rating.'/100</b>',$num_votes);
+		$output .= wfMessage('w4g_rb-current_user_rating','<b>'.$average_rating.'/100</b>',$num_votes);
 		}
 	else
 		{
 		$average_rating = 0;
 		$num_votes = 0;
-		$output .= wfMsg('w4g_rb-nobody_voted').'<br/>';
+		$output .= wfMessage('w4g_rb-nobody_voted').'<br/>';
 		}
 	
 	# Close AJAX area
@@ -645,7 +645,7 @@ query2page(W4GRB.query_url['.$bid.'],"w4g_rb_area-'.$bid.'",2,'.$bid.');';
 	$output .='
 <div class="rating_box" id="rating_box-'.$bid.'">
 <div class="rating_target" id="rating_target-'.$bid.'" onmouseout="updatebox(\''.$bid.'\',W4GRB.user_rating['.$bid.'])">
-<div class="w4g_rb_nojs">&nbsp;'.wfMsg('w4g_rb-error_need_js').'</div>
+<div class="w4g_rb_nojs">&nbsp;'.wfMessage('w4g_rb-error_need_js').'</div>
 </div>
 <div class="rating_text"><div class="rating_text_text" id="rating_text-'.$bid.'"></div></div>
 </div>
@@ -682,7 +682,7 @@ function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
 // Make a link to a user page of the wiki using MediaWiki's API
 function W4GrbMakeLinkUser( $user_id, $user_name, $displayusertools = false )
 {
-	if($user_id==0) return wfMsg('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
+	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
 	global $wgUser;
 	$skin = $wgUser->getSkin();
 	

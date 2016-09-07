@@ -17,14 +17,14 @@
 **
 *********************************************************************/
 
-.rating_box {width:242px;height:11px;border:1px solid #333333;margin:0px;padding:0px;background-color:#555555;} /* the box with bar and rating */
-.rating_target {width:202px;height:11px;border:1px solid #333333;margin:0px;padding:0px;background-color:#555555;position:absolute;float:left;} /* the bar only */
+.rating_box {width:242px;height:15px;border:1px solid #333333;margin:0px;padding:0px;background-color:#555555;} /* the box with bar and rating */
+.rating_target {width:202px;height:15px;border:1px solid #333333;margin:0px;padding:0px;background-color:#555555;position:absolute;float:left;} /* the bar only */
 .rating_text {width:40px;height:11px;border:1px solid #333333;
 	margin:0px;margin-left:202px;margin-bottom:2px;padding:0px;font-family:arial;font-size:10px;
-	background-color:#999999;position:absolute;float:left;} /* the rating only */
+	background-color:#999999;position:absolute;float:left;padding-top:4px} /* the rating only */
 .rating_text_text {margin:-4px 2px;padding:0px;position:absolute;float:left;z-index:1;} /* the text within the rating text box, so we can move it higher and make the box smaller */
 
-.w4g_rb_barblock {width:2px;height:11px;margin:0px;padding:0px;position:absolute;float:left;} /* a tiny block, for bar pixels*/
+.w4g_rb_barblock {width:2px;height:15px;margin:0px;padding:0px;position:absolute;float:left;} /* a tiny block, for bar pixels*/
 .w4g_rb_nojs {margin:-4px 2px;font-family:arial;font-size:10px;color:#ff9999;} /* for the "must enable JS" message */
 .w4g_rb-error {font-weight: bold; color:#ff0000;} /* for error messages */
 .w4g_rb-rating-page-named {font-weight: bold;} /* for the small area displaying the title of the page being voted on when different from the page where the bar is displayed */
