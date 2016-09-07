@@ -18,7 +18,12 @@ function query2page(b, c, a, e) {
     d.onreadystatechange = function() {
         if (d.readyState == 4) {
             if (a == 1 || a == 2) document.getElementById(c).innerHTML = d.responseText;
-            a == 2 && (W4GRB.user_rating[e] = document.getElementById("w4g_rb_rating_value-" + e).innerHTML == null ? W4GRB.average_rating[e] : document.getElementById("w4g_rb_rating_value-" + e).innerHTML, updatebox(e, W4GRB.user_rating[e]))
+			if (document.getElementById("w4g_rb_rating_value-" + e) == null){
+				W4GRB.user_rating[e] = W4GRB.average_rating[e];
+				updatebox(e, W4GRB.user_rating[e]);
+			}else {
+				a == 2 && (W4GRB.user_rating[e] = document.getElementById("w4g_rb_rating_value-" + e).innerHTML == null ? W4GRB.average_rating[e] : document.getElementById("w4g_rb_rating_value-" + e).innerHTML, updatebox(e, W4GRB.user_rating[e]))
+			}
         }
     };
     d.open("GET", b, !0);
