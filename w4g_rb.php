@@ -386,7 +386,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 							W4GrbMakeLinkUser(User::idFromName($user), $user),
 							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
 							$max_items,
-							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
+							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))->plain()
 						.'</caption>' : '')
 			.'<tr>'
 			.'<th>'.wfMessage('w4g_rb-page').'</th>'
@@ -527,7 +527,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 						.'</caption>' : '')
 			.'<tr>'
 			.'<th>'.wfMessage('w4g_rb-user').'</th>'
-			.($wgW4GRB_Settings['show-voter-names']? '<th>'.wfMessage('w4g_rb-rating').'</th>' : '')
+			.($wgW4GRB_Settings['show-voter-names']? '<th>'.wfMessage('w4g_rb-average').'</th>' : '')
 			.($hidevotecount? '' : '<th>'.wfMessage('w4g_rb-vote-count').'</th>')
 			.'</tr>';
 		while($row = $dbslave->fetchObject($result))
@@ -669,6 +669,6 @@ function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
 function W4GrbMakeLinkUser( $user_id, $user_name)
 {
 	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
-	$link = Linker::link(Title::makeTitle(2, $user_name), $user_name );
+	$link = Linker::link(Title::makeTitle(2, $user_name), $user_name);
 	return $link; 
 }
