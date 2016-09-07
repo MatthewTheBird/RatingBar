@@ -76,20 +76,11 @@ $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
 	'name' => 'W4G Rating Bar',
 	'author' => array(	'[http://www.patheticcockroach.com David Dernoncourt]',
-						'[http://www.francky.me Franck Dernoncourt]'),
+						'[http://www.francky.me Franck Dernoncourt]', 'Reddo'), 
 	'url' => 'http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar',
 	'descriptionmsg' => 'w4g_rb-desc-hook',
-	'version' => '2.1.2',
+	'version' => '2.2',
 );
-/*$wgExtensionCredits['specialpage'][] = array(
-	'path' => __FILE__,
-	'name' => 'W4G Rating Bar',
-	'author' => array(	'[http://www.patheticcockroach.com David Dernoncourt]',
-						'[http://www.francky.me Franck Dernoncourt]'),
-	'url' => 'http://www.patheticcockroach.com',
-	'descriptionmsg' => 'w4g_rb-desc-special',
-	'version' => '1.9-dev-10',
-);*/
 
 $wgHooks['ParserFirstCallInit'][] = 'W4GrbSetup'; # Setup function
 $wgHooks['LanguageGetMagic'][]    = 'W4GrbMagic'; # Initialise magic words
@@ -207,7 +198,7 @@ function W4GrbShowRatingBar ( $parser, $fullpagename = '' )
 function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 {
 	global $W4GRB_ratinglist_count, $wgW4GRB_Settings;
-	$hidevotecount;
+	$hidevotecount = false;
 	if(is_int($W4GRB_ratinglist_count))
 		{
 		if($W4GRB_ratinglist_count>=$wgW4GRB_Settings['max-lists-per-page'])
@@ -220,12 +211,6 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	# Get neeeded globals
 	global $wgScriptPath, $wgDBprefix;
 	global $wgW4GRB_Path;
-	
-	# Add CSS on first call (this can result in adding this twice if already added by the bar - not sure if fixing this is really worth the perf loss)
-#	if(!$wgW4GRB_Settings['auto-include'] && $w4g_ratinglist_calls<=1)
-#	{
-#	$parser->mOutput->addHeadItem('<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
-#	}
 	
 	# Possible types: toppages, topvoters, uservotes, pagevotes, latestvotes
 	
@@ -376,8 +361,6 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		$user = $wgW4GRB_Settings['fix-spaces'] ? str_replace("_"," ",$argv['user']) : $argv['user'];
 		if(is_null(User::idFromName($user))) return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_user_with_this_name',htmlspecialchars($user)).'</br></span>';
 		
-//		$conn = LoadBalancer::getConnection();
-
 		$dbslave = wfGetDB( DB_SLAVE );
 		$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime,'user.user_name="'.$user.'"');
 		$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user, '.$wgDBprefix.'page AS page';
@@ -518,6 +501,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	**/
 	if(isset($argv['topvoters']) && $wgW4GRB_Settings['allow-unoptimized-queries'])
 	{
+		$hidevotecount = false;
 		$dbslave = wfGetDB( DB_SLAVE );
 		$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.time>'.$starttime);
 		$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user';
@@ -682,11 +666,9 @@ function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
 }
 
 // Make a link to a user page of the wiki using MediaWiki's API
-function W4GrbMakeLinkUser( $user_id, $user_name, $displayusertools = false )
+function W4GrbMakeLinkUser( $user_id, $user_name)
 {
 	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
-	
-	$link = Linker::link( $user_id, $user_name );
-//	if($displayusertools) $link .= $skin->userToolLinks( $user_id, $user_name );
+	$link = Linker::link(Title::makeTitle(2, $user_name), $user_name );
 	return $link; 
 }
