@@ -1,2 +1,9 @@
 # w4g_ratingbar
-rating bar for mediawiki based on others work
+
+This project is based on the orignal work of David and Franck Dernoncourt for wiki 4 games, it displays a rating bar on a wiki page that the user can use to rate something from 1 - 100.
+
+for useage see: http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar/syntax
+
+for installation see: https://www.mediawiki.org/wiki/Extension:W4G_Rating_Bar
+
+I've only tested the rating functionality on MW 1.27.1, the mmigration feature to update from rating bar 1.1 I updated so it no longer generates errors but I haven't tested the functionality of it, use at your own risk.
