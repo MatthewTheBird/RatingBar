@@ -166,7 +166,6 @@ class W4GRBPage
 			$this->valid=true;
 			}
 		$dbslave->freeResult($result);
-		#return $dbslave->lastQuery();  # used to find out that mysql_real_escape_string seems to be done automatically
 		unset($dbslave);
 		return $this->valid;
 	}

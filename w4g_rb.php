@@ -101,6 +101,7 @@ function W4GrbSetup ( &$parser )
 	# Function hook associating the magic word with its function
 	$parser->setFunctionHook( 'w4grb_rate', 'W4GrbShowRatingBar' );
 	$parser->setFunctionHook( 'w4grb_rawrating', 'W4GrbShowRawRating' );
+	$parser->setFunctionHook( 'w4grb_cat_rating', 'W4GrbShowCatRating' );
 	# Tag hook for the toplist
 	$parser->setHook( 'w4grb_ratinglist', 'W4GrbShowRatingList' );
 	return true;
@@ -113,6 +114,7 @@ function W4GrbMagic ( &$magicWords, $langCode = 'en' )
 	# All remaining elements are synonyms for our parser function
 	$magicWords['w4grb_rate'] = array( 1, 'w4grb_rate' );
 	$magicWords['w4grb_rawrating'] = array( 1, 'w4grb_rawrating' );
+	$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
 	return true; # just needed
 }
 
@@ -199,6 +201,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 {
 	global $W4GRB_ratinglist_count, $wgW4GRB_Settings;
 	$hidevotecount = false;
+//	$parser->disableCache();
 	if(is_int($W4GRB_ratinglist_count))
 		{
 		if($W4GRB_ratinglist_count>=$wgW4GRB_Settings['max-lists-per-page'])
@@ -302,7 +305,6 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 				.'</tr>';
 			}
 		$out .= "</table>";
-		#return $out.'<br/>'.$dbslave->lastQuery();
 		$dbslave->freeResult($result);
 		unset($dbslave);
 		return $out;
@@ -411,6 +413,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	**/
 	if(isset($argv['toppages']))
 	{
+		$out = "";
 		# Minimum number of votes to include the page in the toplist
 		if(isset($argv['minvotecount']) && $argv['minvotecount']>1)
 			$minvotecount = intval($argv['minvotecount']);
@@ -473,7 +476,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			. ($displaytitle? '<caption>'
 						.wfMessage('w4g_rb-caption-toppages',
 							($topvotecount ? wfMessage('w4g_rb-amount-of-votes') : wfMessage('w4g_rb-average-rating')),
-							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',htmlspecialchars($category)) : ''),
+							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
 							$max_items,
 							(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
 							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
@@ -487,7 +490,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			{
 			$out .= '<tr>'
 				.'<td>'.W4GrbMakeLinkPage($row->ns, $row->title).'</td>'
-				.($hideavgrating? '' : '<td>'.round($row->avg).'%</td>')
+				.($hideavgrating? '' : '<td>'.round($row->avg,2).'%</td>')
 				.($hidevotecount? '' : '<td>'.$row->n.'</td>')
 				.'</tr>';
 			}
@@ -545,6 +548,38 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	}
 
 	return wfMessage('w4g_rb-error_syntax_check_doc','<a href="http://www.wiki4games.com/Wiki4Games:W4G Rating Bar">','</a>');
+}
+
+function W4GrbShowCatRating ( $parser, $category = '', $type = '' ){
+	global $wgDBprefix;
+	$out;
+
+	if($category == '') $category = $parser->getTitle()->getBaseText();
+	$category = str_replace(' ', '_', $category);
+
+	$dbslave = wfGetDB( DB_SLAVE );
+	$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>0');
+	$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
+
+	$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page, '.$wgDBprefix.'categorylinks AS catlink';
+
+	$result=$dbslave->select(
+		$database_filter,
+		'AVG(w4grb_avg.avg) AS avg',
+		$where_filter,
+		__METHOD__,
+		array()
+	);
+
+	while($row = $dbslave->fetchObject($result))
+	{
+		$out = round($row->avg,1).'%';
+	}
+
+	$dbslave->freeResult($result);
+	unset($dbslave);
+
+	return $out;
 }
 
 function W4GrbShowRawRating ( $parser, $fullpagename = '', $type = '' )
