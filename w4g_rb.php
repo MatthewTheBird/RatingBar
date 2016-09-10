@@ -82,6 +82,12 @@ $wgExtensionCredits['parserhook'][] = array(
 	'version' => '2.2',
 );
 
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'makeRatingBarDBChanges';
+function makeRatingBarDBChanges( DatabaseUpdater $updater ) {
+	$updater->addExtensionTable( 'w4grb_votes', __DIR__ . '/create_tables.sql' );
+	return true;
+}
+
 $wgHooks['ParserFirstCallInit'][] = 'W4GrbSetup'; # Setup function
 $wgHooks['LanguageGetMagic'][]    = 'W4GrbMagic'; # Initialise magic words
 $wgHooks['BeforePageDisplay'][] = 'W4GrbAutoShow'; # Setup function
@@ -422,6 +428,8 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		# If hidevotecount is set the user doesn't want to display the number of votes
 		$hidevotecount = isset($argv['hidevotecount']);
 		
+		$sortOrder = (isset($argv['order']) && $argv['order'] == 'ASC') ? 'ASC'  : 'DESC';
+		
 		# If hideavgrating is set the user doesn't want to display the average rating
 		$hideavgrating = isset($argv['hideavgrating']);
 		
@@ -434,8 +442,8 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 		if(!$wgW4GRB_Settings['allow-unoptimized-queries']
 			|| $starttime==0)
 			{
-			if($topvotecount) $top_filter = 'w4grb_avg.n DESC';
-			else $top_filter = 'w4grb_avg.avg DESC';
+			if($topvotecount) $top_filter = 'w4grb_avg.n '.$sortOrder;
+			else $top_filter = 'w4grb_avg.avg '.$sortOrder;
 			
 			$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>='.$minvotecount);
 			$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page';
@@ -454,8 +462,8 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			}
 		else
 			{
-			if($topvotecount) $top_filter = 'COUNT(*) DESC';
-			else $top_filter = 'AVG(w4grb_votes.vote) DESC';
+			if($topvotecount) $top_filter = 'COUNT(*) '.$sortOrder;
+			else $top_filter = 'AVG(w4grb_votes.vote) '.$sortOrder;
 			
 			$where_filter = array('w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime);
 			$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'page AS page';
@@ -472,16 +480,26 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 					array('GROUP BY' => 'page.page_id', 'HAVING' => 'COUNT(*)>='.$minvotecount, 'ORDER BY' => $top_filter, 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 					);
 			}
-		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
-			. ($displaytitle? '<caption>'
-						.wfMessage('w4g_rb-caption-toppages',
-							($topvotecount ? wfMessage('w4g_rb-amount-of-votes') : wfMessage('w4g_rb-average-rating')),
-							(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
-							$max_items,
-							(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
-							(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
-						.'</caption>' : '')
-			.'<tr>'
+		if ($sortOrder == 'ASC'){
+		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'. ($displaytitle? '<caption>'
+			.wfMessage('w4g_rb-caption-bottom-pages',
+				($topvotecount ? wfMessage('w4g_rb-amount-of-votes') : wfMessage('w4g_rb-average-rating')),
+				(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
+				$max_items,
+				(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
+				(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))	
+				.'</caption>' : '');
+		} else {
+		$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'. ($displaytitle? '<caption>'
+			.wfMessage('w4g_rb-caption-toppages',
+				($topvotecount ? wfMessage('w4g_rb-amount-of-votes') : wfMessage('w4g_rb-average-rating')),
+				(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
+				$max_items,
+				(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
+				(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))			
+				.'</caption>' : '');
+		}
+			$out .= '<tr>'
 			.'<th>'.wfMessage('w4g_rb-page').'</th>'
 			.($hideavgrating? '' : '<th>'.wfMessage('w4g_rb-rating').'</th>')
 			.($hidevotecount? '' : '<th>'.wfMessage('w4g_rb-vote-count').'</th>')

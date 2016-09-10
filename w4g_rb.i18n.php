@@ -8,7 +8,7 @@ $messages['en'] = array(
 	'w4g_rb-desc-special' => 'A page to query the ratings cast using the W4G Rating Bar.',
 	'right-w4g_rb-canvote' => 'Cast votes on W4G Rating Bars',
 	
-	'w4g_rb-current_user_rating' => 'Current user rating: $1 ({{PLURAL:$2|one vote|$2 votes}})',
+	'w4g_rb-current_user_rating' => 'Current user rating: $1 ({{PLURAL:$2|1 vote|$2 votes}})',
 	'w4g_rb-you_didnt_vote' => 'You didn&#39;t vote on this yet',
 	'w4g_rb-nobody_voted' => 'Nobody voted on this yet',
 	'w4g_rb-no_page_with_this_name' => 'Oops! No page seems to have this name ($1). If you are just previewing a new or very recently created page,
@@ -28,6 +28,7 @@ $messages['en'] = array(
 	'w4g_rb-latest-votes' => 'Latest votes$1 (showing up to $2 votes$3)',
 	'w4g_rb-caption-pagevotes' => 'Votes for $1 (showing up to $2 votes$3)',
 	'w4g_rb-caption-toppages' => 'Pages with the highest $1&nbsp;$2 (showing up to $3 pages$4&nbsp;$5)',
+	'w4g_rb-caption-bottom-pages' => 'Pages with the lowest $1&nbsp;$2 (showing up to $3 pages$4&nbsp;$5)',
 	'w4g_rb-caption-topvoters' => 'Users who voted the most$1$2 (showing up to $3 voters)',
 	'w4g_rb-caption-user-votes' => '$1&#39;s votes$2 (showing up to $3 votes&nbsp;$4)',
 	'w4g_rb-votes-in-days' => 'in the last $1 days',
