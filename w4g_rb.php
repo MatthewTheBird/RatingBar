@@ -40,6 +40,7 @@ $dir = dirname(__FILE__) . '/';
 * max-items-per-list: maximum amount of items that can be displayed in a top list
 * max-lists-per-page: maximum amount of pages that can be displayed in a single page
 * multivote-cooldown: time, in seconds, to consider that the same IP = the same person to prevent multivote
+* category-cache-time: time, in seconds, before updating the category average
 * show-mismatching-bar: boolean, whether or not to display the name of the page being voted on if it's not the same as the page on which the bar is displayed
 * show-voter-names: boolean, whether or not it's possible to publicly link user names to their ratings
 ***************/
@@ -55,6 +56,7 @@ $wgW4GRB_Settings = array (
 	'max-items-per-list' => 100,
 	'max-lists-per-page' => 10,
 	'multivote-cooldown' => 3600*24*7,
+	'category-cache-time' => 3600*24*7,
 	'show-mismatching-bar' => true,
 	'show-voter-names' => false );
 
@@ -207,7 +209,6 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 {
 	global $W4GRB_ratinglist_count, $wgW4GRB_Settings;
 	$hidevotecount = false;
-//	$parser->disableCache();
 	if(is_int($W4GRB_ratinglist_count))
 		{
 		if($W4GRB_ratinglist_count>=$wgW4GRB_Settings['max-lists-per-page'])
@@ -301,7 +302,7 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 			.'<th>'.wfMessage('w4g_rb-rating').'</th>'
 			.'<th>'.wfMessage('w4g_rb-user').'</th>'
 			.'</tr>';
-		while($row = $dbslave->fetchObject($result))
+			while($row = $dbslave->fetchObject($result))
 			{
 			$out .= '<tr>'
 				.'<td>'.date("F j, Y, g:i a",($row->time)).'</td>'
@@ -568,35 +569,93 @@ function W4GrbShowRatingList ( $input, $argv, $parser, $frame )
 	return wfMessage('w4g_rb-error_syntax_check_doc','<a href="http://www.wiki4games.com/Wiki4Games:W4G Rating Bar">','</a>');
 }
 
-function W4GrbShowCatRating ( $parser, $category = '', $type = '' ){
+function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
 	global $wgDBprefix;
+	global $wgW4GRB_Settings;
 	$out;
+	$update = false;
+	$insert = false;
 
 	if($category == '') $category = $parser->getTitle()->getBaseText();
 	$category = str_replace(' ', '_', $category);
 
-	$dbslave = wfGetDB( DB_SLAVE );
-	$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>0');
-	$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
-
-	$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page, '.$wgDBprefix.'categorylinks AS catlink';
-
-	$result=$dbslave->select(
+	$dbmaster = wfGetDB( DB_MASTER );
+	
+	$where_filter = array('w4grb_cat_avg.page="'.$category.'"');
+	$database_filter = $wgDBprefix.'w4grb_cat_avg AS w4grb_cat_avg';
+	
+	$result=$dbmaster->selectRow(
 		$database_filter,
-		'AVG(w4grb_avg.avg) AS avg',
+		'avg, n, time',
 		$where_filter,
 		__METHOD__,
 		array()
 	);
 
-	while($row = $dbslave->fetchObject($result))
-	{
-		$out = round($row->avg,1).'%';
+	//data found in db
+	if($result){
+		//check if the current data is old
+		$time =  $result->time;
+		$diff = time() - $time;
+		
+		if ($wgW4GRB_Settings['category-cache-time'] < $diff){
+			$update = true;
+		}
+		//if it's not old let's store it and move on
+		else {
+			$avg = round($result->avg,1);
+			$count = $result->n;
+		}
+	}
+	//data not found in db
+	else {
+		$insert = true;
+	}
+	//get new data
+	if ($update || $insert){
+		$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>0');
+		$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
+
+		$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page, '.$wgDBprefix.'categorylinks AS catlink';
+
+		$row=$dbmaster->selectRow(
+			$database_filter,
+			'AVG(w4grb_avg.avg) AS avg, SUM(w4grb_avg.n) AS n',
+			$where_filter,
+			__METHOD__,
+			array()
+		);
+		
+		$avg = round($row->avg,1);
+		$count = $row->n;
+		
+		//insert the new data into the table
+		if ($insert){
+				$dbmaster->insert('w4grb_cat_avg',
+				array(	'page' => $category,
+						'avg' => $avg,
+						'n' => $count,
+						'time' => time()),
+				__METHOD__ ) or die('Category average instert failed!');
+		}
+		//update an existing row
+		if ($update){
+			if (!$dbmaster->update('w4grb_cat_avg',
+				array(	'avg' => $avg,
+						'n' => $count,
+						'time' => time()),
+				array(	'page' => $category),
+				__METHOD__ ))
+			echo 'Category average update failed!';
+		}
 	}
 
-	$dbslave->freeResult($result);
-	unset($dbslave);
-
+	//set out to the data requested
+	$out = $avg;
+	if ($votes == 'votes'){
+		$out = $count;
+	}
+	unset($dbmaster);
 	return $out;
 }
 
