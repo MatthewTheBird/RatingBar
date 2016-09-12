@@ -628,6 +628,7 @@ function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
 		
 		$avg = round($row->avg,1);
 		$count = $row->n;
+		if ($count == null) $count = 0;
 		
 		//insert the new data into the table
 		if ($insert){
