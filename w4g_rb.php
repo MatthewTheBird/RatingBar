@@ -577,7 +577,7 @@ function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
 	$insert = false;
 
 	if($category == '') $category = $parser->getTitle()->getBaseText();
-	$category = str_replace(' ', '_', $category);
+	$category = addslashes(str_replace(' ', '_', $category));
 
 	$dbmaster = wfGetDB( DB_MASTER );
 	
@@ -782,6 +782,6 @@ function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
 function W4GrbMakeLinkUser( $user_id, $user_name)
 {
 	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
-	$link = Linker::link(Title::makeTitle(2, $user_name), $user_name);
+	$link = Linker::link(Title::makeTitle(NS_USER, $user_name), $user_name);
 	return $link; 
 }
