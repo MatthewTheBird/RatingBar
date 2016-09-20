@@ -44,7 +44,7 @@ $dir = dirname(__FILE__) . '/';
 * show-mismatching-bar: boolean, whether or not to display the name of the page being voted on if it's not the same as the page on which the bar is displayed
 * show-voter-names: boolean, whether or not it's possible to publicly link user names to their ratings
 ***************/
-$wgW4GRB_Path = '/extensions/W4G Rating Bar';
+$wgW4GRB_Path = '/extensions/RatingBar';
 $wgW4GRB_Settings = array (
 	'ajax-fresh-data' => true,
 	'allow-unoptimized-queries' => true,
@@ -84,27 +84,24 @@ $wgExtensionCredits['parserhook'][] = array(
 	'version' => '2.2',
 );
 
-$wgHooks['LoadExtensionSchemaUpdates'][] = 'makeRatingBarDBChanges';
-function makeRatingBarDBChanges( DatabaseUpdater $updater ) {
-	$updater->addExtensionTable( 'w4grb_votes', __DIR__ . '/create_tables.sql' );
-	return true;
-}
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'W4G::makeRatingBarDBChanges';
+$wgHooks['ParserFirstCallInit'][] = 'W4G::W4GrbSetup'; # Setup function
+$wgHooks['LanguageGetMagic'][]    = 'W4G::W4GrbMagic'; # Initialise magic words
+$wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
 
-$wgHooks['ParserFirstCallInit'][] = 'W4GrbSetup'; # Setup function
-$wgHooks['LanguageGetMagic'][]    = 'W4GrbMagic'; # Initialise magic words
-$wgHooks['BeforePageDisplay'][] = 'W4GrbAutoShow'; # Setup function
 
-// Permissions
-$wgGroupPermissions['*']['w4g_rb-canvote'] = false;
-$wgGroupPermissions['user']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['autoconfirmed']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['bot']['w4g_rb-canvote'] = false;
-$wgGroupPermissions['sysop']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['bureaucrat']['w4g_rb-canvote'] = true;
-$wgAvailableRights[] = 'w4g_rb-canvote';
-
-# Setup function
-function W4GrbSetup ( &$parser )
+class W4G {
+	static function makeRatingBarDBChanges( DatabaseUpdater $updater ) {
+		global $wgExtNewTables, $wgExtModifiedFields;
+		$updater->addExtensionTable( 'w4grb_votes', __DIR__ . '/create_votes.sql' );
+		$updater->addExtensionTable( 'w4grb_avg', __DIR__ . '/create_avg.sql' );
+		$updater->addExtensionTable( 'w4grb_cat_avg', __DIR__ . '/create_cat_avg.sql' );
+		$updater->modifyExtensionField( 'w4grb_votes', 'uid', __DIR__ . '/annon_voting.sql' );
+		return true;
+	}
+	
+	# Setup function
+static function W4GrbSetup ( &$parser )
 {
 	# Function hook associating the magic word with its function
 	$parser->setFunctionHook( 'w4grb_rate', 'W4GrbShowRatingBar' );
@@ -114,9 +111,8 @@ function W4GrbSetup ( &$parser )
 	$parser->setHook( 'w4grb_ratinglist', 'W4GrbShowRatingList' );
 	return true;
 }
-
 # Initialise magic words
-function W4GrbMagic ( &$magicWords, $langCode = 'en' )
+static function W4GrbMagic ( &$magicWords, $langCode = 'en' )
 {
 	# The first array element is whether to be case sensitive, in this case (0) it is not case sensitive, 1 would be sensitive
 	# All remaining elements are synonyms for our parser function
@@ -125,11 +121,10 @@ function W4GrbMagic ( &$magicWords, $langCode = 'en' )
 	$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
 	return true; # just needed
 }
-
 /**
 * To include the rating bar on every page if auto-include is true
 **/
-function W4GrbAutoShow(&$out, &$sk)
+static function W4GrbAutoShow(&$out, &$sk)
 {
 	# $out is of class OutpuPage (includes/OutputPage.php
 	global $wgW4GRB_Settings;
@@ -150,6 +145,18 @@ function W4GrbAutoShow(&$out, &$sk)
 	# $out->addHTML('arff'.$W4GRB_ratingbar_count.get_class($out)); # that was for debugging
 	return $out;
 }
+
+}
+
+// Permissions
+$wgGroupPermissions['*']['w4g_rb-canvote'] = false;
+$wgGroupPermissions['user']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['autoconfirmed']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['bot']['w4g_rb-canvote'] = false;
+$wgGroupPermissions['sysop']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['bureaucrat']['w4g_rb-canvote'] = true;
+$wgAvailableRights[] = 'w4g_rb-canvote';
+
 
 /**
 * To include the rating bar when called by {{#w4grb_rate:[full page name]}}

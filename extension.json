@@ -1,0 +1,74 @@
+{
+	"name": "W4G Rating Bar",
+	"version": "2.2",
+	"author": [
+		"[http://www.patheticcockroach.com David Dernoncourt]",
+		"[http://www.francky.me Franck Dernoncourt]",
+		"[http://www.aiowiki.com/User:Reddo Reddo]"
+	],
+	"url": "http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar",
+	"descriptionmsg": "w4g_rb-desc-hook",
+	"type": "parserhook",
+	"GroupPermissions": {
+		"*": {
+			"w4g_rb-canvote": false
+		},
+		"user": {
+			"w4g_rb-canvote": true
+		},
+		"autoconfirmed": {
+			"w4g_rb-canvote": true
+		},
+		"bot": {
+			"w4g_rb-canvote": false
+		},
+		"sysop": {
+			"w4g_rb-canvote": true
+		},
+		"bureaucrat": {
+			"w4g_rb-canvote": true
+		}
+	},
+	"AvailableRights": [
+		"w4g_rb-canvote"
+	],
+	"SpecialPages": {
+		"W4GRB": "W4GRB"
+	},
+	"ExtensionMessagesFiles": {
+		"w4g_rb": "w4g_rb.i18n.php"
+	},
+	"AutoloadClasses": {
+		"W4GRB": "SpecialW4GRB_body.php",
+		"W4GRBPage": "w4g_rb-page.class.php",
+		"W4G": "w4g_rb.php"
+	},
+	"Hooks": {
+		"LoadExtensionSchemaUpdates": "W4G::makeRatingBarDBChanges",
+		"ParserFirstCallInit": "W4G::W4GrbSetup",
+		"LanguageGetMagic": "W4G::W4GrbMagic",
+		"BeforePageDisplay": "W4G::W4GrbAutoShow"
+	},
+	"config": {
+		"W4GRB_Path": "/extensions/RatingBar",
+		"W4GRB_Settings": {
+			"ajax-fresh-data": true,
+			"allow-unoptimized-queries": true,
+			"anonymous-voting-enabled": false,
+			"auto-include": false,
+			"default-items-per-list": 10,
+			"fix-spaces": true,
+			"max-bars-per-page": 2,
+			"max-items-per-list": 100,
+			"max-lists-per-page": 10,
+			"multivote-cooldown": 604800,
+			"category-cache-time": 604800,
+			"show-mismatching-bar": true,
+			"show-voter-names": false
+		},
+		"ExtensionAliasesFiles": {
+			"w4g_rb": "/extensions/RatingBar/w4g_rb.alias.php"
+		}
+	},
+	"manifest_version": 1
+}
