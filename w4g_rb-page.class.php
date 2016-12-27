@@ -10,8 +10,8 @@
 ** Home Page : http://www.wiki4games.com/Wiki4Games:W4G Rating Bar
 **
 ** This program is licensed under the Creative Commons
-** Attribution-Noncommercial-No Derivative Works 3.0 Unported license
-** <http://creativecommons.org/licenses/by-nc-nd/3.0/legalcode>
+** Attribution-ShareAlike 4.0 license
+** <https://creativecommons.org/licenses/by-sa/4.0/>
 **
 ** The attribution part of the license prohibits any unauthorized editing of any line related to
 ** $wgExtensionCredits['parserhook'][] and $wgExtensionCredits['specialpage'][]
