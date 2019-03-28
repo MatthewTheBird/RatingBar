@@ -86,7 +86,7 @@ $wgExtensionCredits['parserhook'][] = array(
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'W4G::makeRatingBarDBChanges';
 $wgHooks['ParserFirstCallInit'][] = 'W4G::W4GrbSetup'; # Setup function
 $wgHooks['LanguageGetMagic'][]    = 'W4G::W4GrbMagic'; # Initialise magic words
-$wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
+//$wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
 
 
 class W4G {
