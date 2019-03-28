@@ -86,7 +86,7 @@ $wgExtensionCredits['parserhook'][] = array(
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'W4G::makeRatingBarDBChanges';
 $wgHooks['ParserFirstCallInit'][] = 'W4G::W4GrbSetup'; # Setup function
 $wgHooks['LanguageGetMagic'][]    = 'W4G::W4GrbMagic'; # Initialise magic words
-//$wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
+$wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
 
 
 class W4G {
@@ -127,7 +127,7 @@ static function W4GrbAutoShow(&$out, &$sk)
 {
 	# $out is of class OutpuPage (includes/OutputPage.php
 	global $wgW4GRB_Settings;
-	if(!$wgW4GRB_Settings['auto-include']) return $out;
+	if(!$wgW4GRB_Settings['auto-include']) return true;
 	
 	global $wgW4GRB_Path;
 	global $wgScriptPath;
@@ -137,12 +137,12 @@ static function W4GrbAutoShow(&$out, &$sk)
 	
 	$page_obj=new W4GRBPage();
 	if(!$page_obj->setFullPageName($out->getTitle()))
-		return $out;
+		return true;
 	
 	$out->addHTML(W4GrbGetBarBase($page_obj,$wgW4GRB_Settings['max-bars-per-page']+1));
 	# global $W4GRB_ratingbar_count; no can access this one for some reason... we'll have to default to max number + 1
 	# $out->addHTML('arff'.$W4GRB_ratingbar_count.get_class($out)); # that was for debugging
-	return $out;
+	return true;
 }
 
 }

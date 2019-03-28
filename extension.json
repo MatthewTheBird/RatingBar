@@ -46,7 +46,8 @@
 	"Hooks": {
 		"LoadExtensionSchemaUpdates": "W4G::makeRatingBarDBChanges",
 		"ParserFirstCallInit": "W4G::W4GrbSetup",
-		"LanguageGetMagic": "W4G::W4GrbMagic"
+		"LanguageGetMagic": "W4G::W4GrbMagic",
+		"BeforePageDisplay": "W4G::W4GrbAutoShow"
 	},
 	"config": {
 		"W4GRB_Path": "/extensions/RatingBar",
