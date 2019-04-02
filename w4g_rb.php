@@ -100,51 +100,50 @@ class W4G {
 	}
 	
 	# Setup function
-static function W4GrbSetup ( &$parser )
-{
-	# Function hook associating the magic word with its function
-	$parser->setFunctionHook( 'w4grb_rate', 'W4GrbShowRatingBar' );
-	$parser->setFunctionHook( 'w4grb_rawrating', 'W4GrbShowRawRating' );
-	$parser->setFunctionHook( 'w4grb_cat_rating', 'W4GrbShowCatRating' );
-	# Tag hook for the toplist
-	$parser->setHook( 'w4grb_ratinglist', 'W4GrbShowRatingList' );
-	return true;
-}
-# Initialise magic words
-static function W4GrbMagic ( &$magicWords, $langCode = 'en' )
-{
-	# The first array element is whether to be case sensitive, in this case (0) it is not case sensitive, 1 would be sensitive
-	# All remaining elements are synonyms for our parser function
-	$magicWords['w4grb_rate'] = array( 1, 'w4grb_rate' );
-	$magicWords['w4grb_rawrating'] = array( 1, 'w4grb_rawrating' );
-	$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
-	return true; # just needed
-}
-/**
-* To include the rating bar on every page if auto-include is true
-**/
-static function W4GrbAutoShow(&$out, &$sk)
-{
-	# $out is of class OutpuPage (includes/OutputPage.php
-	global $wgW4GRB_Settings;
-	if(!$wgW4GRB_Settings['auto-include']) return true;
-	
-	global $wgW4GRB_Path;
-	global $wgScriptPath;
-	# Add JS and CSS
-	$out->addHeadItem('w4g_rb.css','<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
-	$out->addHeadItem('w4g_rb.js','<script type="text/javascript" src="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.js"></script>');
-	
-	$page_obj=new W4GRBPage();
-	if(!$page_obj->setFullPageName($out->getTitle()))
+	static function W4GrbSetup ( &$parser )
+	{
+		# Function hook associating the magic word with its function
+		$parser->setFunctionHook( 'w4grb_rate', 'W4GrbShowRatingBar' );
+		$parser->setFunctionHook( 'w4grb_rawrating', 'W4GrbShowRawRating' );
+		$parser->setFunctionHook( 'w4grb_cat_rating', 'W4GrbShowCatRating' );
+		# Tag hook for the toplist
+		$parser->setHook( 'w4grb_ratinglist', 'W4GrbShowRatingList' );
 		return true;
-	
-	$out->addHTML(W4GrbGetBarBase($page_obj,$wgW4GRB_Settings['max-bars-per-page']+1));
-	# global $W4GRB_ratingbar_count; no can access this one for some reason... we'll have to default to max number + 1
-	# $out->addHTML('arff'.$W4GRB_ratingbar_count.get_class($out)); # that was for debugging
-	return true;
-}
-
+	}
+	# Initialise magic words
+	static function W4GrbMagic ( &$magicWords, $langCode = 'en' )
+	{
+		# The first array element is whether to be case sensitive, in this case (0) it is not case sensitive, 1 would be sensitive
+		# All remaining elements are synonyms for our parser function
+		$magicWords['w4grb_rate'] = array( 1, 'w4grb_rate' );
+		$magicWords['w4grb_rawrating'] = array( 1, 'w4grb_rawrating' );
+		$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
+		return true; # just needed
+	}
+	/**
+	* To include the rating bar on every page if auto-include is true
+	**/
+	static function W4GrbAutoShow(&$out, &$sk)
+	{
+		# $out is of class OutpuPage (includes/OutputPage.php
+		global $wgW4GRB_Settings;
+		if(!$wgW4GRB_Settings['auto-include']) return true;
+		
+		global $wgW4GRB_Path;
+		global $wgScriptPath;
+		# Add JS and CSS
+		$out->addHeadItem('w4g_rb.css','<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
+		$out->addHeadItem('w4g_rb.js','<script type="text/javascript" src="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.js"></script>');
+		
+		$page_obj=new W4GRBPage();
+		if(!$page_obj->setFullPageName($out->getTitle()))
+			return true;
+		
+		$out->addHTML(W4GrbGetBarBase($page_obj,$wgW4GRB_Settings['max-bars-per-page']+1));
+		# global $W4GRB_ratingbar_count; no can access this one for some reason... we'll have to default to max number + 1
+		# $out->addHTML('arff'.$W4GRB_ratingbar_count.get_class($out)); # that was for debugging
+		return true;
+	}
 }
 
 // Permissions
