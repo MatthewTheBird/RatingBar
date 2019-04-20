@@ -582,11 +582,12 @@ function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
 	$insert = false;
 
 	if($category == '') $category = $parser->getTitle()->getBaseText();
-	$category = addslashes(str_replace(' ', '_', $category));
+	$category = str_replace(' ', '_', $category);
+	$escaped_category = addslashes($category);
 
 	$dbmaster = wfGetDB( DB_MASTER );
 	
-	$where_filter = array('w4grb_cat_avg.page="'.$category.'"');
+	$where_filter = array('w4grb_cat_avg.page="'.$escaped_category.'"');
 	$database_filter = $wgDBprefix.'w4grb_cat_avg AS w4grb_cat_avg';
 	
 	$result=$dbmaster->selectRow(
@@ -619,7 +620,7 @@ function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
 	//get new data
 	if ($update || $insert){
 		$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>0');
-		$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$category.'"'));
+		$where_filter = array_merge($where_filter,array('catlink.cl_from=w4grb_avg.pid','catlink.cl_to="'.$escaped_category.'"'));
 
 		$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page, '.$wgDBprefix.'categorylinks AS catlink';
 
