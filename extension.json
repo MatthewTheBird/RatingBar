@@ -36,6 +36,7 @@
 		"W4GRB": "W4GRB"
 	},
 	"ExtensionMessagesFiles": {
+		"W4GRBMagic": "w4g_rb.i18n.magic.php",
 		"w4g_rb": "w4g_rb.i18n.php"
 	},
 	"AutoloadClasses": {
@@ -46,7 +47,6 @@
 	"Hooks": {
 		"LoadExtensionSchemaUpdates": "W4G::makeRatingBarDBChanges",
 		"ParserFirstCallInit": "W4G::W4GrbSetup",
-		"LanguageGetMagic": "W4G::W4GrbMagic",
 		"BeforePageDisplay": "W4G::W4GrbAutoShow"
 	},
 	"config": {

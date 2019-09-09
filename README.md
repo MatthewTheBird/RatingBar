@@ -6,10 +6,8 @@ For usage see: http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar/syntax
 
 For installation see: https://www.mediawiki.org/wiki/Extension:W4G_Rating_Bar
 
-I've only tested the rating bar functionality on MW 1.27.1+ probably works with 1.27, 1.26 and earlier may not work.
+I've only tested the rating bar functionality on MW 1.27.1 probably works with 1.27, 1.26 and earlier may not work.
 The mmigration feature to update from rating bar v1.1 I have not tested at all, I updated so it no longer generates errors but nothing else, use at your own risk.
-
-If you are using 1.32 maybe 1.31? and getting an error on the category average function use the 1.32 branch it handles what I beleive to be a bug in MW, I've tested the branch with php 7.2 MW 1.32.0.
 
 This is licensed under a [Creative Commons Attribution-ShareAlike License, version 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 We are aware that this is a terrible license for code, but we didn't choose it.
