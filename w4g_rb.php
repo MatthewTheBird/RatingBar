@@ -99,6 +99,7 @@ class W4G {
 		return true;
 	}
 
+/*
 	# Initialise magic words
 	static function W4GrbMagic ( &$magicWords, $langCode = 'en' )
 	{
