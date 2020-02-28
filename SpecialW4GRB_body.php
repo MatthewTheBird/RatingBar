@@ -62,7 +62,7 @@ class W4GRB extends UnlistedSpecialPage
 		if ($vote_sent > 100) $vote_sent=100;
 		else if ($vote_sent < 0) $vote_sent=0;
 		
-		$dbslave = wfGetDB( DB_SLAVE );
+		$dbslave = wfGetDB( DB_REPLICA );
 		
 		# Check if the page ID is valid
 		$result = $dbslave->select('page', 'page_id,page_title',
@@ -218,7 +218,7 @@ class W4GRB extends UnlistedSpecialPage
 	global $wgW4GRB_Settings;
 	$out = '';
 		
-	$dbslave = wfGetDB( DB_SLAVE );
+	$dbslave = wfGetDB( DB_REPLICA );
 	
 	# Gets average rating
 	$result = $dbslave->select('w4grb_avg', 'avg,n',

@@ -54,7 +54,7 @@ class W4GRBPage
 	/** "load averages": sets $avg_rating and $n_voters */
 	private function loadAVG()
 	{
-		$dbslave = wfGetDB( DB_SLAVE );
+		$dbslave = wfGetDB( DB_REPLICA );
 		
 		$result = $dbslave->select('w4grb_avg', 'avg,n',
 				array('pid' => $this->page_id),
@@ -115,7 +115,7 @@ class W4GRBPage
 		$this->reset();
 		$this->page_id = intval($pid);
 		
-		$dbslave = wfGetDB( DB_SLAVE );
+		$dbslave = wfGetDB( DB_REPLICA );
 		$result = $dbslave->select('page', 'page_title,page_namespace',
 					array('page_id' => $this->page_id),
 					__METHOD__);
@@ -155,7 +155,7 @@ class W4GRBPage
 			$this->page_name = substr($this->fullpagename, strpos($this->fullpagename,':') + 1);
 		else $this->page_name = $this->fullpagename;
 		
-		$dbslave = wfGetDB( DB_SLAVE );
+		$dbslave = wfGetDB( DB_REPLICA );
 		$result = $dbslave->select('page', 'page_id',
 					array(	'page_title' => $this->page_name,
 							'page_namespace' => $this->NS_id),

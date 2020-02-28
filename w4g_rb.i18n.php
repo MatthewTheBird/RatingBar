@@ -8,7 +8,7 @@ $messages['en'] = array(
 	'w4g_rb-desc-special' => 'A page to query the ratings cast using the W4G Rating Bar.',
 	'right-w4g_rb-canvote' => 'Cast votes on W4G Rating Bars',
 	
-	'w4g_rb-current_user_rating' => 'Current user rating: $1 ({{PLURAL:$2|1 vote|$2 votes}})',
+	'w4g_rb-current_user_rating' => 'Current user rating: $1% ({{PLURAL:$2|1 vote|$2 votes}})',
 	'w4g_rb-you_didnt_vote' => 'You didn&#39;t vote on this yet',
 	'w4g_rb-nobody_voted' => 'Nobody voted on this yet',
 	'w4g_rb-no_page_with_this_name' => 'Oops! No page seems to have this name ($1). If you are just previewing a new or very recently created page,
