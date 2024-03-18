@@ -47,4 +47,4 @@ All the people who helped there http://www.wiki4games.com/Wiki4Games_talk:Rating
 
 -----------------------------------------------------------------------------------
 ... and finally, thanks to http://patorjk.com/software/taag/ for the
-						THANKS ASCII art ;) (font: Roman)
+						"THANKS" ASCII art ;) (font: Roman)
