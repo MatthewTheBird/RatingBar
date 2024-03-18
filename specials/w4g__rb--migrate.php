@@ -24,12 +24,12 @@
 **/
 $W4GRBmigrationDBhost					= '';	// Copy value from $ratingbar_dbhost
 $W4GRBmigrationDBuser					= '';	// Copy value from $ratingbar_dbuser
-$W4GRBmigrationDBpass					= '';		// Copy value from $ratingbar_dbpass
-$W4GRBmigrationDBname					= '';// Copy value from $ratingbar_dbname
-$W4GRBmigrationTablePrefix				= '';		// Copy value from $table_prefix
+$W4GRBmigrationDBpass					= '';	// Copy value from $ratingbar_dbpass
+$W4GRBmigrationDBname					= '';	// Copy value from $ratingbar_dbname
+$W4GRBmigrationTablePrefix				= '';	// Copy value from $table_prefix
 $W4GRBmigrationTableBase				= '';	// Copy value from $ratingbar_tablename
-$remove_anonymous_votes                 = false;			// Whether or not you want to remove anonymous votes if you set this to false, you'll want to make sure the primary key of the w4grb_votes table is (uid,pid,ip)
-$W4GRBmigrationFollow					= 100;			// Every $W4GRBmigrationFollow lines inserted you'll get a progress-o-meter message
+$remove_anonymous_votes                 = false;// Whether or not you want to remove anonymous votes if you set this to false, you'll want to make sure the primary key of the w4grb_votes table is (uid,pid,ip)
+$W4GRBmigrationFollow					= 100;	// Every $W4GRBmigrationFollow lines inserted you'll get a progress-o-meter message
 
 $W4GRBmigrationTableName=$W4GRBmigrationTablePrefix.$W4GRBmigrationTableBase;
 $wgSpecialPages['W4GRBMigrate'] = 'W4GRBMigrate';
@@ -65,7 +65,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 		$dbmaster = wfGetDB( DB_MASTER ); # exceptionnally we'll run all on master
 #		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
 		
-		echo 'Database connection successful, starting vote import...<br/>';
+		echo 'Database connection successful, starting vote import...<br>';
 		$i=0;
 		while($db_old_row=mysqli_fetch_array($db_old_result))
 			{
@@ -76,7 +76,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			
 			if(!$page_obj->setFullPageName($db_old_row['page_id'])) # Check if the page name is valid
 				{
-				echo 'Error: no page with textual ID '.$db_old_row['page_id'].' => skipping line '.$i.'.<br/>';
+				echo 'Error: no page with textual ID '.$db_old_row['page_id'].' => skipping line '.$i.'.<br>';
 				continue;
 				}
 			$pid=$page_obj->getPID();
@@ -86,7 +86,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			# Check if the vote wasn't anonymous
 			if($uid==0 && $remove_anonymous_votes)
 				{
-				echo 'Anonymous vote on page '.$pid.' skipped.<br/>';
+				echo 'Anonymous vote on page '.$pid.' skipped.<br>';
 				continue;
 				}
 
@@ -97,12 +97,12 @@ class W4GRBMigrate extends UnlistedSpecialPage
 					'ip' => $ip,
 					'time' => $time),
 			__METHOD__ ))
-				echo 'Error: couldn&#39;t insert line '.$i.' (this is probably multiple anonymous votes on a same page from a same IP)<br/>';
-			#else echo $dbmaster->lastQuery().'=>OK<br/>';
-			if(round($i/$W4GRBmigrationFollow)*$W4GRBmigrationFollow==$i) echo $i.' lines processed.<br/>';
+				echo 'Error: couldn&#39;t insert line '.$i.' (this is probably multiple anonymous votes on a same page from a same IP)<br>';
+			#else echo $dbmaster->lastQuery().'=>OK<br>';
+			if(round($i/$W4GRBmigrationFollow)*$W4GRBmigrationFollow==$i) echo $i.' lines processed.<br>';
 			}
 		
-		echo 'All votes imported (a total of '.$i.' lines were read). Generating average ratings table...<br/>';
+		echo 'All votes imported (a total of '.$i.' lines were read). Generating average ratings table...<br>';
 
 		$result=$dbmaster->select(
 				$wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'page AS page',
@@ -111,7 +111,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 				__METHOD__,
 				array('GROUP BY' => 'page.page_id')
 				);
-		#echo $dbmaster->lastQuery().'=>OK?<br/>';
+		#echo $dbmaster->lastQuery().'=>OK?<br>';
 		$i=0;
 		while($row = $dbmaster->fetchObject($result))
 			{
@@ -121,10 +121,10 @@ class W4GRBMigrate extends UnlistedSpecialPage
 					'avg' => $row->avg,
 					'n' => $row->n),
 			__METHOD__ ))
-				echo 'Error: couldn&#39;t insert average rating for page '.$row->pid.'<br/>';
-			if(round($i/$W4GRBmigrationFollow)*$W4GRBmigrationFollow==$i) echo $i.' pages processed.<br/>';
+				echo 'Error: couldn&#39;t insert average rating for page '.$row->pid.'<br>';
+			if(round($i/$W4GRBmigrationFollow)*$W4GRBmigrationFollow==$i) echo $i.' pages processed.<br>';
 			}
-		echo 'All average ratings have been imported (a total of '.$i.' pages were treated).<br/>';
+		echo 'All average ratings have been imported (a total of '.$i.' pages were treated).<br>';
 		echo 'That&#39;s it, all done!';
 	}
 }

@@ -1,0 +1,11 @@
+*~
+*.kate-swp
+.*.swp
+scripts/remotes
+node_modules/
+vendor/
+\#*#
+.eslintcache
+
+/.idea
+/.code
