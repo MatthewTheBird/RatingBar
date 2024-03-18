@@ -1,14 +1,22 @@
 {
-	"name": "W4G Rating Bar",
-	"version": "2.2",
+    "$schema": "https://gerrit.wikimedia.org/r/plugins/gitiles/mediawiki/core/+/HEAD/docs/extension.schema.v2.json?format=JSON",
+	"type": "parserhook",
+    "name": "W4G Rating Bar",
+    "version": "2.3.0",
 	"author": [
 		"[http://www.patheticcockroach.com David Dernoncourt]",
 		"[http://www.francky.me Franck Dernoncourt]",
 		"[http://www.aiowiki.com/User:Reddo Reddo]"
 	],
 	"url": "http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar",
-	"descriptionmsg": "w4g_rb-desc-hook",
-	"type": "parserhook",
+	"descriptionmsg": "w4g_rb-desc",
+    "license-name": "CC-BY-SA-4.0",
+    "requires": {
+        "MediaWiki": ">= 1.34.0",
+        "platform": {
+            "php": ">= 8.0"
+        }
+    },
 	"GroupPermissions": {
 		"*": {
 			"w4g_rb-canvote": false
@@ -29,46 +37,5 @@
 			"w4g_rb-canvote": true
 		}
 	},
-	"AvailableRights": [
-		"w4g_rb-canvote"
-	],
-	"SpecialPages": {
-		"W4GRB": "W4GRB"
-	},
-	"ExtensionMessagesFiles": {
-		"W4GRBMagic": "w4g_rb.i18n.magic.php",
-		"w4g_rb": "w4g_rb.i18n.php"
-	},
-	"AutoloadClasses": {
-		"W4GRB": "SpecialW4GRB_body.php",
-		"W4GRBPage": "w4g_rb-page.class.php",
-		"W4G": "w4g_rb.php"
-	},
-	"Hooks": {
-		"LoadExtensionSchemaUpdates": "W4G::makeRatingBarDBChanges",
-		"ParserFirstCallInit": "W4G::W4GrbSetup",
-		"BeforePageDisplay": "W4G::W4GrbAutoShow"
-	},
-	"config": {
-		"W4GRB_Path": "/extensions/RatingBar",
-		"W4GRB_Settings": {
-			"ajax-fresh-data": true,
-			"allow-unoptimized-queries": true,
-			"anonymous-voting-enabled": false,
-			"auto-include": false,
-			"default-items-per-list": 10,
-			"fix-spaces": true,
-			"max-bars-per-page": 2,
-			"max-items-per-list": 100,
-			"max-lists-per-page": 10,
-			"multivote-cooldown": 604800,
-			"category-cache-time": 604800,
-			"show-mismatching-bar": true,
-			"show-voter-names": false
-		},
-		"ExtensionAliasesFiles": {
-			"w4g_rb": "/extensions/RatingBar/w4g_rb.alias.php"
-		}
-	},
-	"manifest_version": 1
+    "manifest_version": 2
 }
