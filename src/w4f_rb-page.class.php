@@ -7,7 +7,7 @@
 **                - David Dernoncourt <www.patheticcockroach.com>
 **                - Franck Dernoncourt <www.francky.me>
 **
-** Home Page : http://www.wiki4games.com/Wiki4Games:W4G Rating Bar
+** Home Page: http://www.wiki4games.com/Wiki4Games:W4G Rating Bar
 **
 ** This program is licensed under the Creative Commons
 ** Attribution-ShareAlike 4.0 license
