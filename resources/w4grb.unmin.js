@@ -43,4 +43,4 @@ function updatebox(b, c) {
         a <= c ? document.getElementById("w4g_rb_n" + b + "id" + a).style.backgroundColor = "rgb(" + e + "," + d + ",0)" : document.getElementById("w4g_rb_n" + b + "id" + a).style.backgroundColor = "#555555"
     }
     document.getElementById("rating_text-" + b).innerHTML = "&nbsp;" + c + "%"
-};
+}
