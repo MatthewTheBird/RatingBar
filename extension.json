@@ -12,6 +12,11 @@
 	"descriptionmsg": "w4g_rb-desc",
     "license-name": "CC-BY-SA-4.0",
 	"type": "parserhook",
+	"AutoloadClasses": {
+		"W4GRB": "includes/W4GRB.php",
+		"W4GRBPage": "includes/W4GRBPage.php",
+		"W4G": "includes/W4G.php"
+	},
     "requires": {
         "MediaWiki": ">= 1.34.0",
         "platform": {
@@ -69,7 +74,7 @@
         },
 		"ExtensionAliasesFiles": {
             "value": {
-	    		"w4g_rb": "/extensions/RatingBar/w4g_rb.alias.php"
+	    		"w4g_rb": "/extensions/RatingBar/W4GRB.alias.php"
             },
             "path": false,
             "description": "",
