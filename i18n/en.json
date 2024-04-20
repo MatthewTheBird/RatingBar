@@ -26,7 +26,7 @@
 	"w4g_rb-caption-bottom-pages": "Pages with the lowest $1&nbsp;$2 (showing up to $3 pages$4&nbsp;$5)",
 	"w4g_rb-caption-topvoters": "Users who voted the most$1$2 (showing up to $3 voters)",
 	"w4g_rb-caption-user-votes": "$1&#39;s votes$2 (showing up to $3 votes&nbsp;$4)",
-	"w4g_rb-votes-in-days": "in the last $1 days",
+	"w4g_rb-votes-in-days": "in the last $1 {{PLURAL:$1|day|days}}",
 	"w4g_rb-votes-in-cat": "in category $1",
 	"w4g_rb-with-at-least-x-votes": "with at least $1 votes",
 	"w4g_rb-average-rating": "average rating",

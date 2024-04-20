@@ -1,4 +1,28 @@
 <?php
+/**
+ * Functions for a specific page.
+ *
+ * @file
+ *
+ * - __construct
+ * - reset
+ * - loadAVG
+ * - computeCanonicalIndex
+ * - computeCanonicalName
+ * - setPID
+ * - setFullPageName
+ * - exist
+ * - getFullPageName
+ * - getPID
+ * - getPName
+ * - getNsID
+ * - getNsName
+ * - getAVG
+ * - getNVotes
+ * - debug
+ */
+
+namespace MediaWiki\Extension\W4G\RatingBar;
 
 /*********************************************************************
 **
@@ -31,17 +55,17 @@ class W4GRBPage
 	private $NS_name; # page namespace name
 	private $fullpagename; # full page name (like Namespace:Title)
 	private $valid; # true if the page exists, false otherwise
-	
+
 	# not always set (need to ask specifically since it's not always needed and means an extra SQL query)
 	# will be false if not set (beware, when set they CAN be zero, so check the boolean with ===)
 	private $avg_rating; # average rating
 	private $n_voters; # number of voters
-	
+
 	public function __construct()
 	{
 		$this->reset();
 	}
-	
+
 	/** sets all values to what they must be at start */
 	private function reset()
 	{
@@ -50,12 +74,12 @@ class W4GRBPage
 		$this->n_voters = false;
 		$this->NS_name = '';
 	}
-	
+
 	/** "load averages": sets $avg_rating and $n_voters */
 	private function loadAVG()
 	{
 		$dbslave = wfGetDB( DB_REPLICA );
-		
+
 		$result = $dbslave->select('w4grb_avg', 'avg,n',
 				array('pid' => $this->page_id),
 				__METHOD__);
@@ -72,7 +96,7 @@ class W4GRBPage
 		$dbslave->freeResult($result);
 		unset($dbslave);
 	}
-	
+
 	/**
 	* This is an improved version of MWNamespace::getCanonicalIndex which is able to deal properly with the Project: and Project talk: namespaces
 	**/
@@ -104,7 +128,7 @@ class W4GRBPage
 		else if($index==NS_PROJECT_TALK) $result=$localMetaNamespaceTalk;
 		return $result;
 	}
-	
+
 	/**
 	* Sets the object to the page passed to the function.
 	* @param $pid int: must be a page numerical ID
@@ -114,7 +138,7 @@ class W4GRBPage
 	{
 		$this->reset();
 		$this->page_id = intval($pid);
-		
+
 		$dbslave = wfGetDB( DB_REPLICA );
 		$result = $dbslave->select('page', 'page_title,page_namespace',
 					array('page_id' => $this->page_id),
@@ -131,7 +155,7 @@ class W4GRBPage
 		unset($dbslave);
 		return $this->valid;
 	}
-	
+
 	/**
 	* Sets the object to the page passed to the function.
 	* @param $fullname string: must be a full page name, like the one output by {{FULLPAGENAME}} (e.g.Namespace:Title)
@@ -143,7 +167,7 @@ class W4GRBPage
 		$this->reset();
 		$this->fullpagename = $fullname;
 		if($wgW4GRB_Settings['fix-spaces']) $this->fullpagename = str_replace(' ','_',$this->fullpagename);
-		
+
 		# Much gracias to includes/Namespace.php
 		$this->NS_id = NS_MAIN;
 		if(strpos($this->fullpagename,':') && !is_null($this->computeCanonicalIndex(strtolower(substr($this->fullpagename, 0, strpos($this->fullpagename,':'))))))
@@ -154,7 +178,7 @@ class W4GRBPage
 		if($this->NS_id!=NS_MAIN)
 			$this->page_name = substr($this->fullpagename, strpos($this->fullpagename,':') + 1);
 		else $this->page_name = $this->fullpagename;
-		
+
 		$dbslave = wfGetDB( DB_REPLICA );
 		$result = $dbslave->select('page', 'page_id',
 					array(	'page_title' => $this->page_name,
@@ -169,13 +193,13 @@ class W4GRBPage
 		unset($dbslave);
 		return $this->valid;
 	}
-	
+
 	/** Returns true if the object is a proper, existing page. False otherwise. **/
 	public function exist()
 	{
 		return $this->valid;
 	}
-	
+
 	/*
 	* Getters
 	**/
@@ -184,43 +208,43 @@ class W4GRBPage
 		if($this->valid) return $this->fullpagename;
 		else return false;
 	}
-	
+
 	public function getPID()
 	{
 		if($this->valid) return $this->page_id;
 		else return false;
 	}
-	
+
 	public function getPName()
 	{
 		if($this->valid) return $this->page_name;
 		else return false;
 	}
-	
+
 	public function getNsID()
 	{
 		if($this->valid) return $this->NS_id;
 		else return false;
 	}
-	
+
 	public function getNsName()
 	{
 		if($this->valid) return $this->NS_name;
 		else return false;
 	}
-	
+
 	public function getAVG()
 	{
 		if($this->avg_rating===false) $this->loadAVG();
 		return $this->avg_rating;
 	}
-	
+
 	public function getNVotes()
 	{
 		if($this->n_voters===false) $this->loadAVG();
 		return $this->n_voters;
 	}
-	
+
 	/**
 	* Just used when debugging
 	**/

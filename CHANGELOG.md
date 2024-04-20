@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Use PHP namespace (`MediaWiki\Extension\W4G\RatingBar`) for extension codebase.
+
 ### Changed
 
 - CHANGELOG file now follows "Keep a Changelog" 1.1.0 formatting.
 - Reorganize project to follow latest MediaWiki extension directory layout.
 - Rewrite `extension.json` to use MediaWiki extension manifest version 2.
+- Use updated method of registering "magic words".
+- Rename classes to better represent functionality.
 
 ### Removed
 

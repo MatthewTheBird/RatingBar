@@ -1,4 +1,14 @@
 <?php
+/**
+ * Migrate database between versions.
+ *
+ * @file
+ *
+ * - __construct
+ * - execute
+ */
+
+namespace MediaWiki\Extension\W4G\RatingBar;
 
 /*********************************************************************
 **
@@ -40,14 +50,14 @@ class W4GRBMigrate extends UnlistedSpecialPage
 		parent::__construct( 'W4GRBMigrate');
 #		$this->includable( false );
 	}
- 
+
 	function execute( $par )
 	{
 		global $wgRequest, $wgOut, $wgUser, $wgDBprefix;
 		global $W4GRBmigrationDBhost, $W4GRBmigrationDBuser, $W4GRBmigrationDBpass, $W4GRBmigrationDBname, $W4GRBmigrationTableName, $remove_anonymous_votes, $W4GRBmigrationFollow;
-		error_reporting(E_ALL); 
+		error_reporting(E_ALL);
 		ini_set("display_errors", 'on');
-		
+
 		if( wfReadOnly() )
 		{
 			$wgOut->readOnlyPage();
@@ -56,15 +66,15 @@ class W4GRBMigrate extends UnlistedSpecialPage
 
 		$this->setHeaders(); # not sure what that's for
 		$wgOut->disable(); # for raw output
-		
+
 		$db_old = mysqli_connect($W4GRBmigrationDBhost, $W4GRBmigrationDBuser, $W4GRBmigrationDBpass, $W4GRBmigrationDBname) or die("Failed to connected to the database");
 		$query='SELECT * FROM `'.$W4GRBmigrationTableName.'`;';
 		$db_old_result = mysqli_query($db_old, $query) or die('Failed to select table '.$W4GRBmigrationTableName.' (query: '.$query.mysqli_error($db_old));
 		$page_obj=new W4GRBPage();
- 		
+
 		$dbmaster = wfGetDB( DB_MASTER ); # exceptionnally we'll run all on master
 #		$dbmaster->ignoreErrors('off'); # we need this so that failed queries return false
-		
+
 		echo 'Database connection successful, starting vote import...<br>';
 		$i=0;
 		while($db_old_row=mysqli_fetch_array($db_old_result))
@@ -73,7 +83,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			# Read a line
 			$uid=$db_old_row['user_id'];
 			$vote_sent=$db_old_row['rating'];
-			
+
 			if(!$page_obj->setFullPageName($db_old_row['page_id'])) # Check if the page name is valid
 				{
 				echo 'Error: no page with textual ID '.$db_old_row['page_id'].' => skipping line '.$i.'.<br>';
@@ -82,7 +92,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			$pid=$page_obj->getPID();
 			$time=$db_old_row['time'];
 			$ip=$db_old_row['ip'];
-			
+
 			# Check if the vote wasn't anonymous
 			if($uid==0 && $remove_anonymous_votes)
 				{
@@ -101,7 +111,7 @@ class W4GRBMigrate extends UnlistedSpecialPage
 			#else echo $dbmaster->lastQuery().'=>OK<br>';
 			if(round($i/$W4GRBmigrationFollow)*$W4GRBmigrationFollow==$i) echo $i.' lines processed.<br>';
 			}
-		
+
 		echo 'All votes imported (a total of '.$i.' lines were read). Generating average ratings table...<br>';
 
 		$result=$dbmaster->select(

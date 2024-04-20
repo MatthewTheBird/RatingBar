@@ -1,4 +1,23 @@
 <?php
+/**
+ * Main class of extension.
+ *
+ * @file
+ *
+ * - makeRatingBarDBChanges
+ * - W4GrbMagic
+ * - W4GrbSetup
+ * - W4GrbAutoShow
+ * - W4GrbShowRatingBar
+ * - W4GrbShowRatingList
+ * - W4GrbShowCatRating
+ * - W4GrbShowRawRating
+ * - W4GrbGetBarBase
+ * - W4GrbMakeLinkPage
+ * - W4GrbMakeLinkUser
+ */
+
+namespace MediaWiki\Extension\W4G\RatingBar;
 
 /*********************************************************************
 **
@@ -22,27 +41,34 @@
 **
 *********************************************************************/
 
+// Die if not loaded by MediaWiki
 if (!defined('MEDIAWIKI')) die('This file is part of MediaWiki. It is not a valid entry point.');
- 
+
+// Define extension directory path
 $dir = dirname(__FILE__) . '/';
 
-/**************
-* Options (NB: edit the settings you want to customize in LocalSettings.php)
-* $wgW4GRB_Path : path to the extension
-* ajax-fresh-data : boolean, whether or not you want to use AJAX to display an uncached rating to visitors. Set to false if you need to restrict database queries (only affects slave databases).
-* allow-unoptimized-queries: boolean, whether or not to allow queries which need some extra calculations in MySQL
-* anonymous-voting-enabled: boolean, whether or not anonymous (=not logged-in user) voting is enabled
-* auto-include: boolean, whether or not to automatically include the rating bar ON EVERY PAGE
-* default-items-per-list: default amount of items that will be displayed in a top list (NB: this CAN be higher than max-items-per-list by design)
-* fix-spaces: boolean, whether or not you want to enable replacing spaces with underscore in user page name input, so that spaces can be used (otherwise the user must write underscores)
-* max-bars-per-page: maximum amount of bars that can be included within one page (this doesn't count the auto-included bar)
-* max-items-per-list: maximum amount of items that can be displayed in a top list
-* max-lists-per-page: maximum amount of pages that can be displayed in a single page
-* multivote-cooldown: time, in seconds, to consider that the same IP = the same person to prevent multivote
-* category-cache-time: time, in seconds, before updating the category average
-* show-mismatching-bar: boolean, whether or not to display the name of the page being voted on if it's not the same as the page on which the bar is displayed
-* show-voter-names: boolean, whether or not it's possible to publicly link user names to their ratings
-***************/
+/**
+ * Options
+ */
+/**
+ * (Edit the settings you want to customize in your LocalSettings.php)
+ * $wgW4GRB_Path:- - - - - - - - string; path to the extension
+ * $wgW4GRB_Settings:- - - - - - array; includes the following settings...
+	* ajax-fresh-data:- - - - - - - boolean; whether or not you want to use AJAX to display an uncached rating to visitors- set to false if you need to restrict database queries (only affects slave databases)
+	* allow-unoptimized-queries:- - boolean; whether or not to allow queries which need some extra calculations in MySQL
+	* anonymous-voting-enabled: - - boolean; whether or not anonymous (=not logged-in user) voting is enabled
+	* auto-include: - - - - - - - - boolean; whether or not to automatically include the rating bar ON EVERY PAGE
+	* default-items-per-list: - - - int; default amount of items that will be displayed in a top list (NB: this CAN be higher than max-items-per-list by design)
+	* fix-spaces: - - - - - - - - - boolean; whether or not you want to enable replacing spaces with underscore in user page name input, so that spaces can be used (otherwise the user must write underscores)
+	* max-bars-per-page:- - - - - - int; maximum amount of bars that can be included within one page (this doesn't count the auto-included bar)
+	* max-items-per-list: - - - - - int; maximum amount of items that can be displayed in a top list
+	* max-lists-per-page: - - - - - int; maximum amount of pages that can be displayed in a single page
+	* multivote-cooldown: - - - - - int; time, in seconds, to consider that the same IP = the same person to prevent multivote
+	* category-cache-time:- - - - - int; time, in seconds, before updating the category average
+	* show-mismatching-bar: - - - - boolean; whether or not to display the name of the page being voted on if it's not the same as the page on which the bar is displayed
+	* show-voter-names: - - - - - - boolean; whether or not it's possible to publicly link user names to their ratings
+ *
+ */
 $wgW4GRB_Path = '/extensions/RatingBar';
 $wgW4GRB_Settings = array (
 	'ajax-fresh-data' => true,
@@ -57,17 +83,30 @@ $wgW4GRB_Settings = array (
 	'multivote-cooldown' => 3600*24*7,
 	'category-cache-time' => 3600*24*7,
 	'show-mismatching-bar' => true,
-	'show-voter-names' => false );
+	'show-voter-names' => false,
+);
+// END Options
 
-/**************
-* End of options
-***************/
+
+/**
+ * Permissions
+ */
+$wgGroupPermissions['*']['w4g_rb-canvote'] = false;
+$wgGroupPermissions['user']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['autoconfirmed']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['bot']['w4g_rb-canvote'] = false;
+$wgGroupPermissions['sysop']['w4g_rb-canvote'] = true;
+$wgGroupPermissions['bureaucrat']['w4g_rb-canvote'] = true;
+$wgAvailableRights[] = 'w4g_rb-canvote';
+// END Permissions
+
 
 $wgExtensionMessagesFiles['w4g_rb'] = $dir . 'w4g_rb.i18n.php';
 $wgExtensionAliasesFiles['w4g_rb'] = $dir . 'w4g_rb.alias.php';
 $wgAutoloadClasses['W4GRB'] = $dir . 'SpecialW4GRB_body.php';
 $wgSpecialPages['W4GRB'] = "W4GRB";
 $wgAutoloadClasses['W4GRBPage'] = $dir . 'w4g_rb-page.class.php';
+
 
 /*********************************************************************
 * License restriction: ABSOLUTELY DO NOT EDIT THE FOLLOWING ATTRIBUTION LINES
@@ -76,13 +115,18 @@ $wgAutoloadClasses['W4GRBPage'] = $dir . 'w4g_rb-page.class.php';
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
 	'name' => 'W4G Rating Bar',
-	'author' => array(	'[http://www.patheticcockroach.com David Dernoncourt]',
-						'[http://www.francky.me Franck Dernoncourt]', 'Reddo'), 
+	'author' => array(
+		'[http://www.patheticcockroach.com David Dernoncourt]',
+		'[http://www.francky.me Franck Dernoncourt]', 'Reddo'),
 	'url' => 'http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar',
 	'descriptionmsg' => 'w4g_rb-desc-hook',
-	'version' => '2.2',
+	'version' => '2.3.0',
 );
 
+
+/**
+ * Hook into WikiMedia functionality
+ */
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'W4G::makeRatingBarDBChanges';
 $wgHooks['ParserFirstCallInit'][] = 'W4G::W4GrbSetup'; # Setup function
 $wgHooks['LanguageGetMagic'][]    = 'W4G::W4GrbMagic'; # Initialise magic words
@@ -90,7 +134,8 @@ $wgHooks['BeforePageDisplay'][] = 'W4G::W4GrbAutoShow'; # Setup function
 
 
 class W4G {
-	static function makeRatingBarDBChanges( DatabaseUpdater $updater ) {
+	static function makeRatingBarDBChanges( DatabaseUpdater $updater )
+	{
 		global $wgExtNewTables, $wgExtModifiedFields;
 		$updater->addExtensionTable( 'w4grb_votes', __DIR__ . '/create_votes.sql' );
 		$updater->addExtensionTable( 'w4grb_avg', __DIR__ . '/create_avg.sql' );
@@ -99,18 +144,22 @@ class W4G {
 		return true;
 	}
 
-/*
 	# Initialise magic words
 	static function W4GrbMagic ( &$magicWords, $langCode = 'en' )
 	{
 		# The first array element is whether to be case sensitive, in this case (0) it is not case sensitive, 1 would be sensitive
 		# All remaining elements are synonyms for our parser function
-//		$magicWords['w4grb_rate'] = array( 1, 'w4grb_rate' );
-//		$magicWords['w4grb_rawrating'] = array( 1, 'w4grb_rawrating' );
-//		$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
+		$magicWords['w4grb_rate'] = array( 1, 'w4grb_rate' );
+		$magicWords['en'] = [
+			'w4grb_rate' => [1, 'w4grb_rate'],
+			'w4grb_rawrating' => [1, 'w4grb_rawrating'],
+			'w4grb_cat_rating' => [1, 'w4grb_cat_rating'],
+		];
+		$magicWords['w4grb_rawrating'] = array( 1, 'w4grb_rawrating' );
+		$magicWords['w4grb_cat_rating'] = array( 1, 'w4grb_cat_rating' );
 		return true; # just needed
 	}
-	
+
 	# Setup function
 	static function W4GrbSetup ( &$parser )
 	{
@@ -123,7 +172,7 @@ class W4G {
 		$parser->setHook( 'w4grb_ratinglist', 'W4GrbShowRatingList' );
 		return true;
 	}
-	
+
 	/**
 	* To include the rating bar on every page if auto-include is true
 	**/
@@ -132,39 +181,26 @@ class W4G {
 		# $out is of class OutpuPage (includes/OutputPage.php
 		global $wgW4GRB_Settings;
 		if(!$wgW4GRB_Settings['auto-include']) return true;
-		
+
 		global $wgW4GRB_Path;
 		global $wgScriptPath;
 		# Add JS and CSS
 		$out->addHeadItem('w4g_rb.css','<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
 		$out->addHeadItem('w4g_rb.js','<script type="text/javascript" src="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.js"></script>');
-		
+
 		$page_obj=new W4GRBPage();
 		if(!$page_obj->setFullPageName($out->getTitle()))
 			return true;
-		
+
 		$out->addHTML(W4GrbGetBarBase($page_obj,$wgW4GRB_Settings['max-bars-per-page']+1));
 		# global $W4GRB_ratingbar_count; no can access this one for some reason... we'll have to default to max number + 1
 		# $out->addHTML('arff'.$W4GRB_ratingbar_count.get_class($out)); # that was for debugging
 		return true;
 	}
-}
 
-// Permissions
-$wgGroupPermissions['*']['w4g_rb-canvote'] = false;
-$wgGroupPermissions['user']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['autoconfirmed']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['bot']['w4g_rb-canvote'] = false;
-$wgGroupPermissions['sysop']['w4g_rb-canvote'] = true;
-$wgGroupPermissions['bureaucrat']['w4g_rb-canvote'] = true;
-$wgAvailableRights[] = 'w4g_rb-canvote';
-
-
-/**
-* To include the rating bar when called by {{#w4grb_rate:[full page name]}}
-**/
-
-//class RatingBarFun{
+	/**
+	* To include the rating bar when called by {{#w4grb_rate:[full page name]}}
+	**/
 	function W4GrbShowRatingBar ( $parser, $fullpagename = '' )
 	{
 		global $W4GRB_ratingbar_count, $wgW4GRB_Settings;
@@ -176,42 +212,42 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			}
 		else if($wgW4GRB_Settings['max-bars-per-page']>0) $W4GRB_ratingbar_count=1;
 		else return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_no_bar_allowed').'.</br></span>', 'noparse' => true, 'isHTML' => true);
-		
+
 		# Get neeeded globals
 		global $wgScriptPath;
 		global $wgW4GRB_Path;
-		
+
 		# Initialize needed variables
 		$output = '';
-		
+
 		# Add JS and CSS if not added by W4GrbAutoShow
 		if(!$wgW4GRB_Settings['auto-include'] && $W4GRB_ratingbar_count<=1)
 		{
 		$parser->mOutput->addHeadItem('<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.css"/>');
 		$parser->mOutput->addHeadItem('<script type="text/javascript" src="'.$wgScriptPath.$wgW4GRB_Path.'/w4g_rb.js"></script>');
 		}
-		
+
 		$showTitle=true;
 		# Get textual page id
 		if($fullpagename == '') {
 			$fullpagename = $parser->getTitle();
 			$showTitle = false; # no need to show title, we're sure the page where the bar is is the same as the page we're rating
 		}
-		
+
 		$page_obj=new W4GRBPage();
 		if(!$page_obj->setFullPageName($fullpagename))
 			{
 			$parser->disableCache();
 			return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
 			}
-		
+
 		if($showTitle) {
 			$page_obj2=new W4GRBPage();
 			$page_obj2->setFullPageName($parser->getTitle());
 			if($page_obj->getFullPageName()==$page_obj2->getFullPageName()) $showTitle=false;
 		}
 		$output .= W4GrbGetBarBase($page_obj,$W4GRB_ratingbar_count,$showTitle);
-		
+
 		# With this the stuff won't get parsed (otherwise it's treated as wikitext)
 		return array($output, 'noparse' => true, 'isHTML' => true);
 	}
@@ -228,19 +264,19 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			}
 		else if($wgW4GRB_Settings['max-lists-per-page']>0) $W4GRB_ratinglist_count=1;
 		else return '<span class="w4g_ratinglist-error">'.wfMessage('w4g_rb-error_no_list_allowed').'.</span><br/>';
-		
+
 		# Get neeeded globals
 		global $wgScriptPath, $wgDBprefix;
 		global $wgW4GRB_Path;
-		
+
 		# Possible types: toppages, topvoters, uservotes, pagevotes, latestvotes
-		
+
 		# If notitle is set the user doesn't want to display titles
 		$displaytitle = !isset($argv['notitle']);
-		
-		# If nosort is set the user doesn't want a sortable table 
+
+		# If nosort is set the user doesn't want a sortable table
 		$sortable = isset($argv['nosort']) ? '' : 'sortable';
-		
+
 		# Get max number of items
 		if(isset($argv['items']))
 			{
@@ -249,29 +285,29 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			if($max_items<=1) $max_items=$wgW4GRB_Settings['default-items-per-list'];
 			}
 		else $max_items=$wgW4GRB_Settings['default-items-per-list'];
-		
+
 		# Get offset
 		if(isset($argv['offset']) && $argv['offset']>0)
 			$skippy = intval($argv['offset']);
 		else $skippy = 0;
-		
+
 		# Get orderby - possible values: rating
 		if(isset($argv['orderby']) && in_array($argv['orderby'],array('rating')))
 			$orderby = $argv['orderby'];
 		else $orderby='';
-		
+
 		# Get order - possible values: asc, desc
 		if(isset($argv['order']) && in_array($argv['order'],array('asc','desc')))
 			$order = $argv['order'];
 		else $order='';
-		
+
 		# Get category
 		if(isset($argv['category']))
 			$category = $wgW4GRB_Settings['fix-spaces'] ? str_replace(" ","_",$argv['category']) : $argv['category'];
 		else $category='';
-		
+
 		$days = '';
-		
+
 		# Get period (in days) and convert it into the timestamp of the beginning of that period
 		if(isset($argv['days']) && $argv['days']>0)
 			{
@@ -279,7 +315,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			$starttime = time() - ($days * 24 * 3600 );
 			}
 		else $starttime = 0;
-		
+
 
 		/* To display latest votes.
 		**/
@@ -327,7 +363,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			unset($dbslave);
 			return $out;
 		}
-		
+
 		/* To display the votes for one page.
 		**/
 		if(isset($argv['pagevotes']))
@@ -337,7 +373,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			$page_obj=new W4GRBPage();
 			if(!$page_obj->setFullPageName($fullpagename))
 				return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',htmlspecialchars($argv['idpage'])).'</br></span>';
-			
+
 			$dbslave = wfGetDB( DB_REPLICA );
 			$result=$dbslave->select(
 					$wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user',
@@ -371,7 +407,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			unset($dbslave);
 			return $out;
 		}
-		
+
 		/* To display votes by a user
 		**/
 		if(isset($argv['uservotes']))
@@ -380,7 +416,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			if(!isset($argv['user']) || $argv['user']=='') return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-error_missing_param','<i>user</i>').'<br/></span>';
 			$user = $wgW4GRB_Settings['fix-spaces'] ? str_replace("_"," ",$argv['user']) : $argv['user'];
 			if(is_null(User::idFromName($user))) return '<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_user_with_this_name',htmlspecialchars($user)).'</br></span>';
-			
+
 			$dbslave = wfGetDB( DB_REPLICA );
 			$where_filter = array('w4grb_votes.uid=user.user_id','w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime,'user.user_name="'.$user.'"');
 			$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'user AS user, '.$wgDBprefix.'page AS page';
@@ -391,7 +427,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 				}
 			$orderby_field = 'w4grb_votes.time';
 			if($orderby=='rating') $orderby_field = 'w4grb_votes.vote';
-				
+
 			$result=$dbslave->select(
 					$database_filter,
 					'w4grb_votes.pid, w4grb_votes.vote AS vote, w4grb_votes.uid AS uid, w4grb_votes.time AS time, user.user_name AS uname, page.page_namespace AS ns, page.page_title AS title',
@@ -399,7 +435,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 					__METHOD__,
 					array('ORDER BY' => $orderby_field.' '. (($order!='')?$order:'DESC'), 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 					);
-			
+
 			$out = '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 				. ($displaytitle? '<caption>'
 							.wfMessage('w4g_rb-caption-user-votes',
@@ -426,7 +462,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			unset($dbslave);
 			return $out;
 		}
-		
+
 		/* To display top rated pages
 		**/
 		if(isset($argv['toppages']))
@@ -436,27 +472,27 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			if(isset($argv['minvotecount']) && $argv['minvotecount']>1)
 				$minvotecount = intval($argv['minvotecount']);
 			else $minvotecount = 1;
-			
+
 			# If hidevotecount is set the user doesn't want to display the number of votes
 			$hidevotecount = isset($argv['hidevotecount']);
-			
+
 			$sortOrder = (isset($argv['order']) && $argv['order'] == 'ASC') ? 'ASC'  : 'DESC';
-			
+
 			# If hideavgrating is set the user doesn't want to display the average rating
 			$hideavgrating = isset($argv['hideavgrating']);
-			
+
 			# If topvotecount is set we want to sort by vote count instead of rating
 			$topvotecount = isset($argv['topvotecount']);
-			
+
 			$dbslave = wfGetDB( DB_REPLICA );
-			
+
 			# Choose what kind of query to do: simple or with more calculations
 			if(!$wgW4GRB_Settings['allow-unoptimized-queries']
 				|| $starttime==0)
 				{
 				if($topvotecount) $top_filter = 'w4grb_avg.n '.$sortOrder;
 				else $top_filter = 'w4grb_avg.avg '.$sortOrder;
-				
+
 				$where_filter = array('w4grb_avg.pid=page.page_id','w4grb_avg.n>='.$minvotecount);
 				$database_filter = $wgDBprefix.'w4grb_avg AS w4grb_avg, '.$wgDBprefix.'page AS page';
 				if($category!='')
@@ -476,7 +512,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 				{
 				if($topvotecount) $top_filter = 'COUNT(*) '.$sortOrder;
 				else $top_filter = 'AVG(w4grb_votes.vote) '.$sortOrder;
-				
+
 				$where_filter = array('w4grb_votes.pid=page.page_id','w4grb_votes.time>'.$starttime);
 				$database_filter = $wgDBprefix.'w4grb_votes AS w4grb_votes, '.$wgDBprefix.'page AS page';
 				if($category!='')
@@ -499,7 +535,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 					(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
 					$max_items,
 					(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
-					(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))	
+					(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 					.'</caption>' : '');
 			} else {
 			$out .= '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'. ($displaytitle? '<caption>'
@@ -508,7 +544,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 					(($category!='') ? wfMessage('w4g_rb-votes-in-cat',str_replace('_', ' ', htmlspecialchars($category))) : ''),
 					$max_items,
 					(($minvotecount>1) ? wfMessage('w4g_rb-with-at-least-x-votes',$minvotecount) : ''),
-					(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))			
+					(is_int($days)? wfMessage('w4g_rb-votes-in-days',$days) : ''))
 					.'</caption>' : '');
 			}
 				$out .= '<tr>'
@@ -529,7 +565,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			unset($dbslave);
 			return $out;
 		}
-		
+
 		/* To display top voters
 		**/
 		if(isset($argv['topvoters']) && $wgW4GRB_Settings['allow-unoptimized-queries'])
@@ -550,7 +586,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 					__METHOD__,
 					array('GROUP BY' => 'user.user_id', 'ORDER BY' => 'COUNT(*) DESC', 'LIMIT' => $max_items, 'OFFSET' => $skippy)
 					);
-			
+
 			$out = '<table class="w4g_rb-ratinglist-table '.$sortable.'" >'
 				. ($displaytitle? '<caption>'
 							.wfMessage('w4g_rb-caption-topvoters',
@@ -580,7 +616,8 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 		return wfMessage('w4g_rb-error_syntax_check_doc','<a href="http://www.wiki4games.com/Wiki4Games:W4G Rating Bar">','</a>');
 	}
 
-	function W4GrbShowCatRating ( $parser, $category = '', $votes = '' ){
+	function W4GrbShowCatRating ( $parser, $category = '', $votes = '' )
+	{
 		global $wgDBprefix;
 		global $wgW4GRB_Settings;
 		$out = '';
@@ -592,10 +629,10 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 		$escaped_category = addslashes($category);
 
 		$dbmaster = wfGetDB( DB_MASTER );
-		
+
 		$where_filter = array('w4grb_cat_avg.page="'.$escaped_category.'"');
 		$database_filter = $wgDBprefix.'w4grb_cat_avg AS w4grb_cat_avg';
-		
+
 		$result=$dbmaster->selectRow(
 			$database_filter,
 			'avg, n, time',
@@ -609,7 +646,7 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 			//check if the current data is old
 			$time =  $result->time;
 			$diff = time() - $time;
-			
+
 			if ($wgW4GRB_Settings['category-cache-time'] < $diff){
 				$update = true;
 			}
@@ -637,11 +674,11 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 				__METHOD__,
 				array()
 			);
-			
+
 			$avg = round($row->avg,1);
 			$count = $row->n;
 			if ($count == null) $count = 0;
-			
+
 			//insert the new data into the table
 			if ($insert){
 					$dbmaster->insert('w4grb_cat_avg',
@@ -676,20 +713,20 @@ $wgAvailableRights[] = 'w4g_rb-canvote';
 	{
 		$output = '';
 		if(!in_array($type, array('avg','n'))) $type = 'avg';
-		
+
 		# Get textual page id
 		if($fullpagename == '')
 			$fullpagename = $parser->getTitle();
-			
+
 		$page_obj=new W4GRBPage();
 		if(!$page_obj->setFullPageName($fullpagename))
 			return array('<span class="w4g_rb-error">'.wfMessage('w4g_rb-no_page_with_this_name',$fullpagename).'</br></span>', 'noparse' => true, 'isHTML' => true);
-		
+
 		if($type=='avg') $output = $page_obj->getAVG();
 		else if ($type=='n') $output = $page_obj->getNVotes();
 		return $output;
 	}
-	
+
 //}
 
 
@@ -705,7 +742,7 @@ function W4GrbGetBarBase ( W4GRBPage $page_obj, $bid, $showTitle=false )
 	global $wgScriptPath;
 	global $wgW4GRB_Settings;
 	$output = '';
-	
+
 	# If we need to show the page title (and if settings agree)
 	if($showTitle && $wgW4GRB_Settings['show-mismatching-bar'])
 		$output .= '<span class="w4g_rb-rating-page-named">'
@@ -714,7 +751,7 @@ function W4GrbGetBarBase ( W4GRBPage $page_obj, $bid, $showTitle=false )
 
 	# Start AJAX area
 	$output .= '<span id="w4g_rb_area-'.$bid.'">';
-	
+
 	# Get current rating
 	if($page_obj->getNVotes()>0)
 		{
@@ -728,10 +765,10 @@ function W4GrbGetBarBase ( W4GRBPage $page_obj, $bid, $showTitle=false )
 		$num_votes = 0;
 		$output .= wfMessage('w4g_rb-nobody_voted').'<br/>';
 		}
-	
+
 	# Close AJAX area
 	$output .= '</span>';
-	
+
 	# The bar in JavaScript - variable preparation
 	$output .= '
 <script type="text/javascript">
@@ -779,7 +816,7 @@ updatebox('.$bid.',W4GRB.average_rating['.$bid.']);
 
 // Make a link to another page of the wiki using MediaWiki's API
 function W4GrbMakeLinkPage( $page_namespace, $page_title, $safe=false )
-{	
+{
 	if(!$safe)
 		$link = Linker::link(Title::makeTitle($page_namespace, $page_title));
 	else
@@ -798,5 +835,7 @@ function W4GrbMakeLinkUser( $user_id, $user_name)
 {
 	if($user_id==0) return wfMessage('w4g_anonymous'); // deals with user ID 0 (=Anonymous)
 	$link = Linker::link(Title::makeTitle(NS_USER, $user_name), $user_name);
-	return $link; 
+	return $link;
+}
+
 }
