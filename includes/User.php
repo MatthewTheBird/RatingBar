@@ -22,15 +22,7 @@ class Page {
 
     public static function setFullName() {}
 
-    /** Check if the given page ID is valid */
-    public static function checkID() {
-        $result = $dbslave->select('page', 'page_id,page_title',
-        array('page_id' => $this->page_idnum),
-        __METHOD__ ,
-        array('LIMIT' => 1));
-        if(!($row = $dbslave->fetchObject($result))) die('No page with this ID');
-        $dbslave->freeResult($result);
-    }
+    public static function checkID() {}
 
     public static function checkName() {}
 }
