@@ -12,17 +12,22 @@
 	"descriptionmsg": "w4g_rb-desc",
     "license-name": "CC-BY-SA-4.0",
 	"type": "parserhook",
-	"AutoloadClasses": {
-		"W4GRB": "includes/W4GRB.php",
-		"W4GRBPage": "includes/W4GRBPage.php",
-		"W4G": "includes/W4G.php"
-	},
     "requires": {
         "MediaWiki": ">= 1.34.0",
         "platform": {
             "php": ">= 8.0"
         }
     },
+	"AutoloadClasses": {
+		"W4GRB": "includes/W4GRB.php",
+		"W4GRBPage": "includes/W4GRBPage.php",
+		"W4G": "includes/W4G.php"
+	},
+	"Hooks": {
+		"LoadExtensionSchemaUpdates": "W4G::makeRatingBarDBChanges",
+		"ParserFirstCallInit": "W4G::W4GrbSetup",
+		"BeforePageDisplay": "W4G::W4GrbAutoShow"
+	},
 	"GroupPermissions": {
 		"*": {
 			"w4g_rb-canvote": false
@@ -43,44 +48,36 @@
 			"w4g_rb-canvote": true
 		}
 	},
+	"AvailableRights": [
+		"w4g_rb-canvote"
+	],
+	"SpecialPages": {
+		"W4GRB": "W4GRB"
+	},
+	"ExtensionMessagesFiles": {
+		"W4GRBMagic": "w4g_rb.i18n.magic.php",
+		"w4g_rb": "w4g_rb.i18n.php"
+	},
     "config": {
-        "W4GRB_Path": {
-            "value": "/extensions/RatingBar",
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
-        },
+        "W4GRB_Path": "/extensions/RatingBar",
         "W4GRB_Settings": {
-            "value": {
-                "ajax-fresh-data": true,
-                "allow-unoptimized-queries": true,
-                "anonymous-voting-enabled": false,
-                "auto-include": false,
-                "default-items-per-list": 10,
-                "fix-spaces": true,
-                "max-bars-per-page": 2,
-                "max-items-per-list": 100,
-                "max-lists-per-page": 10,
-                "multivote-cooldown": 604800,
-                "category-cache-time": 604800,
-                "show-mismatching-bar": true,
-                "show-voter-names": false
-            },
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
+            "ajax-fresh-data": true,
+            "allow-unoptimized-queries": true,
+            "anonymous-voting-enabled": false,
+            "auto-include": false,
+            "default-items-per-list": 10,
+            "fix-spaces": true,
+            "max-bars-per-page": 2,
+            "max-items-per-list": 100,
+            "max-lists-per-page": 10,
+            "multivote-cooldown": 604800,
+            "category-cache-time": 604800,
+            "show-mismatching-bar": true,
+            "show-voter-names": false
         },
 		"ExtensionAliasesFiles": {
-            "value": {
-	    		"w4g_rb": "/extensions/RatingBar/W4GRB.alias.php"
-            },
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
-		}
+            "w4g_rb": "/extensions/RatingBar/W4GRB.alias.php"
+        }
     },
     "manifest_version": 2
 }
