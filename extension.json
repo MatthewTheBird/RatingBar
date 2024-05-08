@@ -54,9 +54,14 @@
 	"SpecialPages": {
 		"W4GRB": "W4GRB"
 	},
+	"MessagesDirs": {
+		"RatingBar": [
+			"i18n"
+		]
+	},
 	"ExtensionMessagesFiles": {
-		"W4GRBMagic": "w4g_rb.i18n.magic.php",
-		"w4g_rb": "w4g_rb.i18n.php"
+		"RatingBarMagic": "RatingBar.i18n.magic.php",
+		"RatingBar": "RatingBar.i18n.alias.php"
 	},
     "config": {
         "W4GRB_Path": "/extensions/RatingBar",
