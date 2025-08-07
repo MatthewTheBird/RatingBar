@@ -2,27 +2,39 @@
 	"$schema": "https://raw.githubusercontent.com/wikimedia/mediawiki/refs/heads/master/docs/extension.schema.v2.json",
 	"name": "W4G Rating Bar",
 	"namemsg": "w4g_rb-extensionname",
-	"version": "2.3.0",
+	"version": "3.0.0-alpha",
 	"author": [
 		"[http://www.patheticcockroach.com David Dernoncourt]",
 		"[http://www.francky.me Franck Dernoncourt]",
-		"[https://www.aiowiki.com/User:Reddo Reddo]",
+		"[https://www.aiowiki.com/wiki/User:Reddo Reddo]",
 		"[https://matthewbird.ca Matthew Bird]"
 	],
 	"url": "http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar",
 	"descriptionmsg": "w4g_rb-desc",
 	"license-name": "CC-BY-SA-4.0",
 	"type": "parserhook",
-	"AutoloadClasses": {
-		"W4GRB": "includes/W4GRB.php",
-		"W4GRBPage": "includes/W4GRBPage.php",
-		"W4G": "includes/W4G.php"
-	},
 	"requires": {
 		"MediaWiki": ">= 1.34.0",
 		"platform": {
 			"php": ">= 8.0"
 		}
+	},
+	"MessagesDirs": {
+		"RatingBar": [ "i18n" ]
+	},
+	"ExtensionMessagesFiles": {
+		"RatingBarAliases": "RatingBar.i18n.alias.php"
+	},
+	"AutoloadClasses": {
+		"RatingBarVariableHolder": "includes/Variables/VariableHolder.php",
+		"MediaWiki\\Extension\\RatingBar\\Variables\\VariableHolder": "includes/Variables/VariableHolder.php",
+		"W4GRB": "includes/W4GRB.php",
+		"W4GRBPage": "includes/W4GRBPage.php",
+		"W4G": "includes/W4G.php"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\W4G\\RatingBar\\": "includes/",
+		"MediaWiki\\Extension\\W4G\\RatingBar\\Maintenance\\": "maintenance/"
 	},
 	"GroupPermissions": {
 		"*": {

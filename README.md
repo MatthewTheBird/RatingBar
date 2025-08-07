@@ -1,6 +1,6 @@
 # w4g_ratingbar
 
-This project is based on the orignal work of David and Franck Dernoncourt for wiki 4 games, it displays a rating bar on a wiki page that the user can use to rate something from 1 - 100.
+This project is based on the orignal work of David and Franck Dernoncourt for *wiki 4 games*, it displays a rating bar on a wiki page that the user can use to rate something from 1 - 100.
 
 For usage see: [http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar/syntax]
 
