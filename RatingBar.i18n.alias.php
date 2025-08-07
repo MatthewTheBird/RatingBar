@@ -10,5 +10,5 @@ $aliases = [];
 
 /** English (English) */
 $aliases['en'] = [
-    'W4GRB' => [ 'W4GRB' ],
+	'W4GRB' => [ 'W4GRB' ],
 ];

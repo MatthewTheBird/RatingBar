@@ -1,28 +1,29 @@
 {
-    "$schema": "https://gerrit.wikimedia.org/r/plugins/gitiles/mediawiki/core/+/HEAD/docs/extension.schema.v2.json?format=JSON",
-    "name": "W4G Rating Bar",
-    "version": "2.3.0",
+	"$schema": "https://raw.githubusercontent.com/wikimedia/mediawiki/refs/heads/master/docs/extension.schema.v2.json",
+	"name": "W4G Rating Bar",
+	"namemsg": "w4g_rb-extensionname",
+	"version": "2.3.0",
 	"author": [
 		"[http://www.patheticcockroach.com David Dernoncourt]",
 		"[http://www.francky.me Franck Dernoncourt]",
 		"[https://www.aiowiki.com/User:Reddo Reddo]",
-        "[https://matthewbird.ca Matthew Bird]"
+		"[https://matthewbird.ca Matthew Bird]"
 	],
 	"url": "http://www.wiki4games.com/Wiki4Games:W4G_Rating_Bar",
 	"descriptionmsg": "w4g_rb-desc",
-    "license-name": "CC-BY-SA-4.0",
+	"license-name": "CC-BY-SA-4.0",
 	"type": "parserhook",
 	"AutoloadClasses": {
 		"W4GRB": "includes/W4GRB.php",
 		"W4GRBPage": "includes/W4GRBPage.php",
 		"W4G": "includes/W4G.php"
 	},
-    "requires": {
-        "MediaWiki": ">= 1.34.0",
-        "platform": {
-            "php": ">= 8.0"
-        }
-    },
+	"requires": {
+		"MediaWiki": ">= 1.34.0",
+		"platform": {
+			"php": ">= 8.0"
+		}
+	},
 	"GroupPermissions": {
 		"*": {
 			"w4g_rb-canvote": false
@@ -43,44 +44,44 @@
 			"w4g_rb-canvote": true
 		}
 	},
-    "config": {
-        "W4GRB_Path": {
-            "value": "/extensions/RatingBar",
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
-        },
-        "W4GRB_Settings": {
-            "value": {
-                "ajax-fresh-data": true,
-                "allow-unoptimized-queries": true,
-                "anonymous-voting-enabled": false,
-                "auto-include": false,
-                "default-items-per-list": 10,
-                "fix-spaces": true,
-                "max-bars-per-page": 2,
-                "max-items-per-list": 100,
-                "max-lists-per-page": 10,
-                "multivote-cooldown": 604800,
-                "category-cache-time": 604800,
-                "show-mismatching-bar": true,
-                "show-voter-names": false
-            },
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
-        },
+	"config": {
+		"W4GRB_Path": {
+			"value": "/extensions/RatingBar",
+			"path": false,
+			"description": "",
+			"descriptionmsg": "",
+			"public": true
+		},
+		"W4GRB_Settings": {
+			"value": {
+				"ajax-fresh-data": true,
+				"allow-unoptimized-queries": true,
+				"anonymous-voting-enabled": false,
+				"auto-include": false,
+				"default-items-per-list": 10,
+				"fix-spaces": true,
+				"max-bars-per-page": 2,
+				"max-items-per-list": 100,
+				"max-lists-per-page": 10,
+				"multivote-cooldown": 604800,
+				"category-cache-time": 604800,
+				"show-mismatching-bar": true,
+				"show-voter-names": false
+			},
+			"path": false,
+			"description": "",
+			"descriptionmsg": "",
+			"public": true
+		},
 		"ExtensionAliasesFiles": {
-            "value": {
-	    		"w4g_rb": "/extensions/RatingBar/W4GRB.alias.php"
-            },
-            "path": false,
-            "description": "",
-            "descriptionmsg": "",
-            "public": true
+			"value": {
+				"w4g_rb": "/extensions/RatingBar/W4GRB.alias.php"
+			},
+			"path": false,
+			"description": "",
+			"descriptionmsg": "",
+			"public": true
 		}
-    },
-    "manifest_version": 2
+	},
+	"manifest_version": 2
 }

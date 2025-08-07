@@ -8,17 +8,17 @@
 namespace MediaWiki\Extension\W4G\RatingBar;
 
 class Page {
-    public function doesExist() {}
+	public function doesExist() {}
 
-    public function getID() {}
+	public function getID() {}
 
-    public function getName() {}
+	public function getName() {}
 
-    public function getFullName() {}
+	public function getFullName() {}
 
-    public function setID() {}
+	public function setID() {}
 
-    public function setName() {}
+	public function setName() {}
 
-    public function setFullName() {}
+	public function setFullName() {}
 }

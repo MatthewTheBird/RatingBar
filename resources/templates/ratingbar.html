@@ -4,11 +4,11 @@
 <script type="text/javascript">
 //<![CDATA[
 if (typeof(W4GRB) == "undefined") {
-    window.W4GRB = new Object();
-    W4GRB.average_rating = new Array();
-    W4GRB.user_rating = new Array();
-    W4GRB.pid = new Array();
-    W4GRB.query_url = new Array();
+	window.W4GRB = new Object();
+	W4GRB.average_rating = new Array();
+	W4GRB.user_rating = new Array();
+	W4GRB.pid = new Array();
+	W4GRB.query_url = new Array();
 }
 W4GRB.average_rating[{{ $bid }}] = {{ $average_rating }};
 W4GRB.user_rating[{{ $bid }}] = 0;
@@ -19,12 +19,12 @@ query2page(W4GRB.query_url[{{ $bid }}], "w4g_rb_area-{{ $bid }}", 2, {{ $bid }})
 </script>
 
 <div class="rating_box" id="rating_box-{{ $bid }}">
-    <div class="rating_target" id="rating_target-{{ $bid }}" onmouseout="updatebox('{{ $bid }}', W4GRB.user_rating[{{ $bid }}])">
-        <div class="w4g_rb_nojs">&nbsp;{{ wfMessage('w4g_rb-error_need_js') }}</div>
-    </div>
-    <div class="rating_text">
-        <div class="rating_text_text" id="rating_text-{{ $bid }}"></div>
-    </div>
+	<div class="rating_target" id="rating_target-{{ $bid }}" onmouseout="updatebox('{{ $bid }}', W4GRB.user_rating[{{ $bid }}])">
+		<div class="w4g_rb_nojs">&nbsp;{{ wfMessage('w4g_rb-error_need_js') }}</div>
+	</div>
+	<div class="rating_text">
+		<div class="rating_text_text" id="rating_text-{{ $bid }}"></div>
+	</div>
 </div>
 
 <script type="text/javascript">

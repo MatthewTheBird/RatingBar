@@ -8,9 +8,9 @@
 namespace MediaWiki\Extension\W4G\RatingBar;
 
 class Rating {
-    public function getCategoryRating() {}
+	public function getCategoryRating() {}
 
-    public function getPageRating() {}
+	public function getPageRating() {}
 
-    public function getRawRating() {}
+	public function getRawRating() {}
 }

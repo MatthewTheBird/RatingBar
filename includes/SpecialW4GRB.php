@@ -13,14 +13,14 @@ namespace MediaWiki\Extension\W4G\RatingBar;
 
 class SpecialW4GRB extends \UnlistedSpecialPage {
 
-    public const ANONYMOUS_UID = 0;
-    private $bar_id, $page_idnum, $uid;
+		public const ANONYMOUS_UID = 0;
+		private $bar_id, $page_idnum, $uid;
 
-    public function __construct() {
+		public function __construct() {
 		parent::__construct( 'W4GRB' );
-    }
+		}
 
-    public function execute( $par = null ) {}
+		public function execute( $par = null ) {}
 
-    private function justShowVotes() {}
+		private function justShowVotes() {}
 }
